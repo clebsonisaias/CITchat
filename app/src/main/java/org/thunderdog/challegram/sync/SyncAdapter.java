@@ -34,7 +34,7 @@ import org.thunderdog.challegram.unsorted.Settings;
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
   private static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".sync.provider";
   private static final String ACCOUNT_TYPE = BuildConfig.APPLICATION_ID + ".sync.account";
-  private static final String ACCOUNT_NAME = "Telegram";
+  private static final String ACCOUNT_NAME = BuildConfig.PROJECT_NAME;
 
   private static final String EXTRA_ACCOUNT_ID = "account_id";
 

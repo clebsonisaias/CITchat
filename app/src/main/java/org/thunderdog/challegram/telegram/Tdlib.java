@@ -58,6 +58,7 @@ import org.thunderdog.challegram.component.attach.MediaToReplacePickerManager;
 import org.thunderdog.challegram.component.chat.TdlibSingleUnreadReactionsManager;
 import org.thunderdog.challegram.component.dialogs.ChatView;
 import org.thunderdog.challegram.config.Config;
+import org.thunderdog.challegram.core.Branding;
 import org.thunderdog.challegram.core.Lang;
 import org.thunderdog.challegram.data.AvatarPlaceholder;
 import org.thunderdog.challegram.data.ContentPreview;
@@ -5869,7 +5870,7 @@ public class Tdlib implements TdlibProvider, Settings.SettingsChangeListener, Da
           Map<String, TdApi.LanguagePackString> map = new HashMap<>(strings.length);
           for (TdApi.LanguagePackString string : strings) {
             if (string.value.getConstructor() != TdApi.LanguagePackStringValueDeleted.CONSTRUCTOR)
-              map.put(string.key, string);
+              map.put(string.key, Branding.apply(string));
           }
           callback.runWithData(map);
         }
@@ -10923,7 +10924,8 @@ public class Tdlib implements TdlibProvider, Settings.SettingsChangeListener, Da
         int buildNo = 0;
         String version = null;
         String commit = null;
-        final String prefix = "Telegram-X-";
+        // Same prefix as the APK file name (app.name with spaces replaced), so forks never pick up Telegram X builds
+        final String prefix = BuildConfig.PROJECT_NAME.replace(' ', '-') + "-";
         if (!StringUtils.isEmpty(document.fileName) && document.fileName.startsWith(prefix)) {
           int i = document.fileName.indexOf('-', prefix.length());
           version = document.fileName.substring(prefix.length(), i == -1 ? document.fileName.length() : i);

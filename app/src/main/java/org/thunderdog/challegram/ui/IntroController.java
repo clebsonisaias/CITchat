@@ -1347,6 +1347,10 @@ public class IntroController extends ViewController<Void> implements GLSurfaceVi
       return descs[pos];
     } else {
       String text = getString(getTitleString(pos, true));
+      if (pos == 0) {
+        // Telegram API terms: the intro must make clear this is an unofficial app built on the Telegram API
+        text = text + "\n\n" + Lang.getString(displayLanguage.packInfo, R.string.CITchatUnofficialClient, BuildConfig.PROJECT_NAME);
+      }
       return (descs[pos] = Strings.replaceBoldTokens(text, ColorId.text));
     }
   }
@@ -1850,7 +1854,7 @@ public class IntroController extends ViewController<Void> implements GLSurfaceVi
     int size = Screen.dp(220f);
     bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
     Canvas c = new Canvas(bitmap);
-    c.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2, bitmap.getWidth() / 2, Paints.fillingPaint(0xff35a6de));
+    c.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2, bitmap.getWidth() / 2, Paints.fillingPaint(0xff0e7c86)); // CITchat brand colour (R.color.citchat_brand)
     U.recycle(c);
     synchronized (icons) {
       iconsSpecial.put(0, bitmap);

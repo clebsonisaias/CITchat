@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="CITchatUnofficialClient">%1$s é um cliente não oficial do Telegram que usa a API do Telegram. Não é afiliado ao Telegram.</string>
+</resources>

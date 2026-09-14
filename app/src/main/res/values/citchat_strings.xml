@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- CITchat-only strings. Keys must not exist on translations.telegram.org (android_x), otherwise the server value wins. -->
+<resources>
+  <string name="CITchatUnofficialClient">%1$s is an unofficial Telegram client that uses the Telegram API. It is not affiliated with Telegram.</string>
+</resources>

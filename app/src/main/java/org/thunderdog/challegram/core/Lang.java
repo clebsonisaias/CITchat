@@ -333,12 +333,15 @@ public class Lang {
 
   private static String getAndroidString (@StringRes int resId) throws Resources.NotFoundException {
     // TODO non-current languagePackInfo
-    return UI.getAppContext().getResources().getString(resId);
+    return Branding.apply(UI.getAppContext().getResources().getString(resId));
   }
 
   private static String getAndroidString (@StringRes int resId, Object... formatArgs) {
     // TODO non-current languagePackInfo
-    return UI.getAppContext().getResources().getString(resId, formatArgs);
+    // Same as Resources.getString(resId, formatArgs), but the app name is replaced before formatting, so arguments stay untouched
+    Configuration configuration = UI.getAppContext().getResources().getConfiguration();
+    Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? configuration.getLocales().get(0) : configuration.locale;
+    return String.format(locale, getAndroidString(resId), formatArgs);
   }
 
   private static final int FLAG_LOWERCASE = 1;
@@ -3684,6 +3687,7 @@ public class Lang {
     TdApi.LanguagePackStringValueOrdinary string = queryTdlibStringValue(key, language.id);
     if (string == null && !StringUtils.isEmpty(language.baseLanguagePackId))
       string = queryTdlibStringValue(key, language.baseLanguagePackId);
+    Branding.apply(string);
     if (cacheKey != null) {
       putCachedString(cacheKey, string);
     }
@@ -3719,6 +3723,7 @@ public class Lang {
     TdApi.LanguagePackStringValuePluralized string = queryTdlibStringPluralized(key, language.id);
     if (string == null && !StringUtils.isEmpty(language.baseLanguagePackId))
       string = queryTdlibStringPluralized(key, language.baseLanguagePackId);
+    Branding.apply(string);
     if (cacheKey != null) {
       putCachedString(cacheKey, string);
     }

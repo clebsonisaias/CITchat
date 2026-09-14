@@ -171,7 +171,7 @@
       android:stopWithTask="false">
       <property
         android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-        android:value="Telegram X is a messaging app. Users expect to receive instant new message notifications, and the app to be auto-started. A foreground service is required for push messages that require one-time end-to-end encryption key exchange (such as when users receive the first message from a new Secret Chat), for which there is no Firebase Cloud Messaging integration. Other foreground service types do not fit this use case, or can't be used on Android 15 because there are time limits or auto-starting on boot is not allowed. Using the Android work manager isn't an option either." />
+        android:value="CITchat is a messaging app. Users expect to receive instant new message notifications, and the app to be auto-started. A foreground service is required for push messages that require one-time end-to-end encryption key exchange (such as when users receive the first message from a new Secret Chat), for which there is no Firebase Cloud Messaging integration. Other foreground service types do not fit this use case, or can't be used on Android 15 because there are time limits or auto-starting on boot is not allowed. Using the Android work manager isn't an option either." />
     </service>
 
     <service
@@ -278,8 +278,8 @@
       android:name=".receiver.TGAutoMessageReceiver"
       android:exported="false">
       <intent-filter>
-        <action android:name="org.thunderdog.challegram.ACTION_MESSAGE_REPLY" />
-        <action android:name="org.thunderdog.challegram.ACTION_MESSAGE_HEARD" />
+        <action android:name="${applicationId}.ACTION_MESSAGE_REPLY" />
+        <action android:name="${applicationId}.ACTION_MESSAGE_HEARD" />
       </intent-filter>
     </receiver>
     <receiver
@@ -306,9 +306,9 @@
       android:enabled="true"
       android:exported="false">
       <intent-filter>
-        <action android:name="org.thunderdog.challegram.END_CALL" />
-        <action android:name="org.thunderdog.challegram.DECLINE_CALL" />
-        <action android:name="org.thunderdog.challegram.ANSWER_CALL" />
+        <action android:name="${applicationId}.END_CALL" />
+        <action android:name="${applicationId}.DECLINE_CALL" />
+        <action android:name="${applicationId}.ANSWER_CALL" />
       </intent-filter>
     </receiver>
 
@@ -318,11 +318,11 @@
       android:exported="false"
       android:enabled="true">
       <intent-filter>
-        <action android:name="org.thunderdog.challegram.ACTION_PLAY_SKIP_PREVIOUS" />
-        <action android:name="org.thunderdog.challegram.ACTION_PLAY_SKIP_NEXT" />
-        <action android:name="org.thunderdog.challegram.ACTION_PLAY_STOP" />
-        <action android:name="org.thunderdog.challegram.ACTION_PLAY_PLAY" />
-        <action android:name="org.thunderdog.challegram.ACTION_PLAY_PAUSE" />
+        <action android:name="${applicationId}.ACTION_PLAY_SKIP_PREVIOUS" />
+        <action android:name="${applicationId}.ACTION_PLAY_SKIP_NEXT" />
+        <action android:name="${applicationId}.ACTION_PLAY_STOP" />
+        <action android:name="${applicationId}.ACTION_PLAY_PLAY" />
+        <action android:name="${applicationId}.ACTION_PLAY_PAUSE" />
       </intent-filter>
     </receiver>
 
@@ -340,7 +340,7 @@
       android:enabled="true"
       android:exported="false">
       <intent-filter>
-        <action android:name="org.thunderdog.challegram.ACTION_STOP_LOCATION" />
+        <action android:name="${applicationId}.ACTION_STOP_LOCATION" />
       </intent-filter>
     </receiver>
 
