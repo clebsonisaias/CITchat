@@ -1,0 +1,265 @@
+# Compila o APK do CITchat (versao modificada do Telegram X) no GitHub Actions.
+#
+# Secrets (Settings > Secrets and variables > Actions > New repository secret):
+#   TELEGRAM_API_ID, TELEGRAM_API_HASH  https://my.telegram.org > API development tools
+#   KEYSTORE_BASE64, KEYSTORE_PASSWORD  gerados por citchat/gerar-keystore.ps1
+#   GOOGLE_SERVICES_JSON (opcional)     google-services.json do Firebase para br.com.citmax.citchat
+#
+# Passo a passo em citchat/LEIA-ME.md.
+name: CITchat APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      abi:
+        description: 'arm64 = celulares modernos (mais rapido) | arm32 = aparelhos 32 bits | universal = arm64 + arm32'
+        type: choice
+        options:
+          - arm64
+          - arm32
+          - universal
+        default: arm64
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: citchat-apk-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  APP_ID: br.com.citmax.citchat
+  APP_NAME: CITchat
+  # Mesmas versoes de version.properties
+  CMDLINE_TOOLS_VERSION: '15859902'
+  SDK_PACKAGE: android-37.2
+  BUILD_TOOLS_VERSION: 37.0.0
+  NDK_VERSION: 27.3.13750724
+  CMAKE_VERSION: 3.22.1
+
+jobs:
+  apk:
+    name: APK ${{ github.event_name == 'push' && 'universal' || inputs.abi }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    env:
+      ABI: ${{ github.event_name == 'push' && 'universal' || inputs.abi }}
+
+    steps:
+      - name: Conferir secrets
+        env:
+          TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+          TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          missing=""
+          for name in TELEGRAM_API_ID TELEGRAM_API_HASH KEYSTORE_BASE64 KEYSTORE_PASSWORD; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Secrets faltando:$missing. Crie em Settings > Secrets and variables > Actions (veja citchat/LEIA-ME.md)."
+            exit 1
+          fi
+          if ! printf '%s' "$TELEGRAM_API_ID" | tr -d '[:space:]' | grep -Eq '^[0-9]+$'; then
+            echo "::error::TELEGRAM_API_ID deve ter apenas numeros."
+            exit 1
+          fi
+
+      - name: Liberar espaco em disco
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL /usr/local/share/boost /usr/share/swift \
+            /usr/local/share/powershell /usr/local/share/chromium /usr/local/lib/node_modules || true
+          sudo docker image prune --all --force > /dev/null 2>&1 || true
+          df -h /
+
+      - name: Aumentar swap
+        continue-on-error: true
+        run: |
+          sudo swapoff -a || true
+          sudo rm -f /mnt/swapfile
+          sudo fallocate -l 12G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile > /dev/null
+          sudo swapon /mnt/swapfile
+          free -h
+
+      - name: Baixar codigo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          persist-credentials: false
+
+      - name: Baixar submodulos (TDLib via Git LFS)
+        run: |
+          git lfs install
+          git submodule sync --recursive
+          for attempt in 1 2 3; do
+            git submodule update --init --recursive --depth 1 --jobs 8 && break
+            [ "$attempt" = 3 ] && exit 1
+            echo "Nova tentativa em 30s..."; sleep 30
+          done
+          git -C tdlib lfs pull
+          if ! file -L "tdlib/src/main/libs/$NDK_VERSION/arm64-v8a/libtdjni.so" | grep -q ELF; then
+            echo "::error::Os binarios do TDLib (Git LFS) nao foram baixados."
+            exit 1
+          fi
+          test -f tdlib/source/td/CMakeLists.txt
+          df -h /
+
+      - name: Instalar JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache do Android SDK
+        uses: actions/cache@v6
+        with:
+          path: ~/android-sdk
+          key: android-sdk-${{ env.CMDLINE_TOOLS_VERSION }}-${{ env.SDK_PACKAGE }}-${{ env.BUILD_TOOLS_VERSION }}-${{ env.NDK_VERSION }}-${{ env.CMAKE_VERSION }}
+
+      - name: Instalar Android SDK
+        run: |
+          export ANDROID_SDK_ROOT="$HOME/android-sdk"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
+          sdkmanager="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$sdkmanager" ]; then
+            mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+            wget -q -O "$RUNNER_TEMP/cmdline-tools.zip" "https://dl.google.com/android/repository/commandlinetools-linux-${CMDLINE_TOOLS_VERSION}_latest.zip"
+            unzip -q "$RUNNER_TEMP/cmdline-tools.zip" -d "$ANDROID_SDK_ROOT/cmdline-tools"
+            mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          fi
+          yes | "$sdkmanager" --licenses > /dev/null || true
+          "$sdkmanager" --install "platforms;$SDK_PACKAGE" "build-tools;$BUILD_TOOLS_VERSION" "ndk;$NDK_VERSION" "cmake;$CMAKE_VERSION" > /dev/null
+          test -d "$ANDROID_SDK_ROOT/ndk/$NDK_VERSION"
+          test -x "$ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS_VERSION/apksigner"
+
+      - name: Cache do Gradle
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml', '**/*.gradle.kts', 'buildSrc/src/**') }}
+          restore-keys: gradle-
+
+      - name: Preparar local.properties, keystore e Firebase
+        env:
+          TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+          TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          umask 077
+          # Secrets colados pela interface web podem vir com espacos ou quebras de linha
+          TELEGRAM_API_ID=$(printf '%s' "$TELEGRAM_API_ID" | tr -d '[:space:]')
+          TELEGRAM_API_HASH=$(printf '%s' "$TELEGRAM_API_HASH" | tr -d '[:space:]')
+          KEYSTORE_PASSWORD=$(printf '%s' "$KEYSTORE_PASSWORD" | tr -d '\r\n')
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d -i > "$RUNNER_TEMP/citchat-release.p12"
+
+          cat > "$RUNNER_TEMP/keystore.properties" <<EOF
+          keystore.file=$RUNNER_TEMP/citchat-release.p12
+          keystore.password=$KEYSTORE_PASSWORD
+          key.alias=citchat
+          key.password=$KEYSTORE_PASSWORD
+          EOF
+
+          # keystore.file aponta para o keystore.properties (e nao para o .p12)
+          cat > local.properties <<EOF
+          sdk.dir=$ANDROID_SDK_ROOT
+          keystore.file=$RUNNER_TEMP/keystore.properties
+          app.id=$APP_ID
+          app.name=$APP_NAME
+          app.download_url=https://github.com/$GITHUB_REPOSITORY/releases
+          app.sources_url=https://github.com/$GITHUB_REPOSITORY
+          telegram.api_id=$TELEGRAM_API_ID
+          telegram.api_hash=$TELEGRAM_API_HASH
+          tgx.extension=none
+          EOF
+
+          case "$GOOGLE_SERVICES_JSON" in
+            '')
+              echo "::warning::GOOGLE_SERVICES_JSON nao configurado: usando um google-services.json provisorio. O app funciona, mas sem notificacoes push."
+              placeholder_key="AIzaSy$(printf '0%.0s' $(seq 1 33))"
+              cat > app/google-services.json <<EOF
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "citchat-sem-firebase",
+              "storage_bucket": "citchat-sem-firebase.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                  "android_client_info": {
+                    "package_name": "$APP_ID"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "$placeholder_key"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+              ;;
+            *'{'*) printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json ;;
+            *) printf '%s' "$GOOGLE_SERVICES_JSON" | base64 -d -i > app/google-services.json ;;
+          esac
+          if ! grep -q "\"$APP_ID\"" app/google-services.json; then
+            echo "::error::O google-services.json nao tem um app Android com o pacote $APP_ID."
+            exit 1
+          fi
+
+      - name: Compilar APK
+        timeout-minutes: 300
+        run: |
+          ./gradlew --no-daemon --stacktrace --console=plain \
+            "-Dorg.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g -Dkotlin.daemon.jvm.options=-Xmx3g -Dfile.encoding=UTF-8" \
+            "assembleLatest${ABI^}Release"
+
+      - name: Verificar assinatura
+        run: |
+          apk=$(ls app/build/outputs/apk/latest${ABI^}/release/*.apk | head -n 1)
+          # Se o keystore nao for aplicado, o build gera um APK sem assinatura sem avisar
+          "$ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS_VERSION/apksigner" verify --print-certs "$apk"
+          mkdir -p dist
+          cp "$apk" dist/
+          mapping=$(ls app/build/outputs/mapping/latest${ABI^}Release/*.txt 2> /dev/null | head -n 1 || true)
+          if [ -n "$mapping" ]; then cp "$mapping" dist/; fi
+          ls -la dist
+
+      - name: Enviar APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: CITchat-${{ env.ABI }}-${{ github.run_number }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Criar release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/*.apk
+          generate_release_notes: true
