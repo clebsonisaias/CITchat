@@ -31,6 +31,8 @@ O Telegram X só compila em Linux ou macOS e leva de 1 a 2 horas. Por isso a com
    não é possível publicar atualizações do app com a mesma assinatura.
 2. Configure o GitHub (login, fork e Secrets):
    `powershell -ExecutionPolicy Bypass -File citchat\configurar-github.ps1`
+   Se o GitHub CLI já estiver logado, dá para gravar só as credenciais do Telegram por uma janela:
+   `powershell -STA -ExecutionPolicy Bypass -File citchat\credenciais-telegram.ps1`
 3. Envie o código e rode o workflow **CITchat APK** (aba Actions > Run workflow), escolhendo:
    - `arm64`: celulares modernos
    - `arm32`: aparelhos de 32 bits
@@ -54,13 +56,16 @@ notificações push** com o app fechado.
 ## Instalar no celular pelo cabo USB
 
 1. No Android, ative *Opções do desenvolvedor* e *Depuração USB*, e aceite o aviso ao conectar.
-2. `adb install -r CITchat-*.apk`
+2. Baixe a última compilação e instale:
+   `powershell -ExecutionPolicy Bypass -File citchat\instalar-no-celular.ps1`
+   (ou, com um APK já baixado, `adb install -r CITchat-*.apk`)
 
 ## Pendências (próximas etapas)
 
-- **Notificações push:** criar o projeto Firebase, cadastrar o secret `GOOGLE_SERVICES_JSON`
-  (as impressões digitais SHA-1 e SHA-256 da chave estão em `CITchat-segredos\LEIA-ME.txt`) e
-  configurar a chave do Firebase no app em https://my.telegram.org.
+- **Notificações push:** criar o projeto Firebase com o app Android `br.com.citmax.citchat`
+  (as impressões digitais SHA-1 e SHA-256 da chave estão em `CITchat-segredos\LEIA-ME.txt`),
+  cadastrar o secret `GOOGLE_SERVICES_JSON` e enviar a *service account* do Firebase em
+  https://my.telegram.org > API development tools > **FCM credentials**.
 - **Suporte e links:** algumas telas de erro raras ainda citam os canais do Telegram X (@tgx_log,
   @tgandroidtests). Trocar pelos canais do CITchat quando existirem.
 - **Política de privacidade:** o link aponta para telegram.org/privacy. Publicar a política do CITchat.
