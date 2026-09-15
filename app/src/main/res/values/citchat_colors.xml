@@ -5,5 +5,6 @@
   <color name="citchat_brand">#FF00C896</color> <!-- Inovacao (cor 1), Pantone 3395 U -->
   <color name="citchat_brand_mid">#FF008B87</color> <!-- Tecnologia em movimento (cor 2), Pantone 327 U -->
   <color name="citchat_brand_deep">#FF036271</color> <!-- Conexao profunda (cor 3), Pantone 3155 C -->
-  <color name="citchat_launcher_background">#FF00C896</color>
+  <color name="citchat_launcher_background">#FFFFFFFF</color> <!-- Pureza digital, behind the app logo -->
+  <color name="citchat_logo">#FF008A86</color> <!-- hexagon of the CITchat logo (citchat/branding/logo-citchat.svg) -->
 </resources>

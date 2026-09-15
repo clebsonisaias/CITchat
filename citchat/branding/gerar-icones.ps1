@@ -1,18 +1,20 @@
-# Gera os PNGs de marca do CITchat a partir do simbolo oficial da CITmax (hexagono com circuito),
+# Gera os PNGs de marca do CITchat a partir do logo do app (hexagono CITmax com baloes de conversa),
 # direto nas pastas de recursos do app (Windows PowerShell 5.1 + GDI+).
 #
 #   powershell -ExecutionPolicy Bypass -File citchat\branding\gerar-icones.ps1
-#   powershell -ExecutionPolicy Bypass -File citchat\branding\gerar-icones.ps1 -PreviewDir $env:TEMP\citchat-preview
+#   powershell -ExecutionPolicy Bypass -File citchat\branding\gerar-icones.ps1 -FromSvg citchat\branding\logo-citchat.svg
+#   powershell -ExecutionPolicy Bypass -File citchat\branding\gerar-icones.ps1 -PreviewDir $env:TEMP\citchat-preview -PreviewOnly
 #
-# O simbolo fica em citchat/branding/simbolo-citmax.png (branco com transparencia). Ele foi extraido
-# da versao negativa do Manual da marca CITmax (pagina 26: simbolo branco sobre #00C896). Para
-# recriar a partir de uma renderizacao dessa pagina: -FromRender caminho\da\renderizacao.png
+# O logo original e citchat/branding/logo-citchat.svg (exportado do Canva). Com -FromSvg ele e
+# renderizado pelo Microsoft Edge (headless) em citchat/branding/logo-citchat.png, que e a base de
+# todos os icones. Versoes de uma cor (notificacao, icone monocromatico, logos internos) usam a
+# silhueta do hexagono com os baloes vazados.
 param(
   [string]$PreviewDir = '',
   [switch]$PreviewOnly,
-  [string]$FromRender = '',
-  # Manual da marca: Inovacao (cor 1)
-  [string]$BackgroundColor = '#00C896'
+  [string]$FromSvg = '',
+  # Fundo do icone: Pureza digital (branco), do Manual da marca
+  [string]$BackgroundColor = '#FFFFFF'
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -22,32 +24,34 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-public static class CitSymbol {
-  // Render of the negative logo: white symbol over a green (#00C896) area, possibly with a white page
-  // margin on the left. Returns the symbol cropped to its bounds, white with alpha taken from the red channel.
-  public static Bitmap Extract (Bitmap src) {
-    int w = src.Width, h = src.Height;
+public static class CitLogo {
+  static byte[] Read (Bitmap src, out int w, out int h) {
+    w = src.Width; h = src.Height;
     Bitmap argb = src.Clone(new Rectangle(0, 0, w, h), PixelFormat.Format32bppArgb);
     BitmapData data = argb.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
     byte[] px = new byte[w * h * 4];
     Marshal.Copy(data.Scan0, px, 0, px.Length);
     argb.UnlockBits(data);
     argb.Dispose();
-    Func<int, int, int> red = (x, y) => px[(y * w + x) * 4 + 2];
+    return px;
+  }
 
-    // Limits of the green area (the render may include white page margins around it)
-    int x0 = 0;
-    while (x0 < w - 1 && red(x0, h / 2) > 60) x0++;
-    int y0 = 0;
-    while (y0 < h - 1 && red(x0 + 5, y0) > 60) y0++;
-    int x1 = w - 1;
-    while (x1 > x0 && red(x1, y0 + 5) > 60) x1--;
-    int y1 = h - 1;
-    while (y1 > y0 && red(x0 + 5, y1) > 60) y1--;
+  static Bitmap Write (byte[] px, int w, int h) {
+    Bitmap result = new Bitmap(w, h, PixelFormat.Format32bppArgb);
+    BitmapData data = result.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+    Marshal.Copy(px, 0, data.Scan0, px.Length);
+    result.UnlockBits(data);
+    return result;
+  }
+
+  // Crops a transparent render to the bounds of its visible pixels
+  public static Bitmap Crop (Bitmap src) {
+    int w, h;
+    byte[] px = Read(src, out w, out h);
     int minX = w, minY = h, maxX = -1, maxY = -1;
-    for (int y = y0; y <= y1; y++) {
-      for (int x = x0; x <= x1; x++) {
-        if (red(x, y) > 128) {
+    for (int y = 0; y < h; y++) {
+      for (int x = 0; x < w; x++) {
+        if (px[(y * w + x) * 4 + 3] > 8) {
           if (x < minX) minX = x;
           if (x > maxX) maxX = x;
           if (y < minY) minY = y;
@@ -55,42 +59,53 @@ public static class CitSymbol {
         }
       }
     }
-    if (maxX < 0) throw new InvalidOperationException("Symbol not found");
-    minX = Math.Max(x0, minX - 2); minY = Math.Max(y0, minY - 2);
-    maxX = Math.Min(w - 1, maxX + 2); maxY = Math.Min(h - 1, maxY + 2);
-    int cw = maxX - minX + 1, ch = maxY - minY + 1;
+    if (maxX < 0) throw new InvalidOperationException("Empty render");
+    return src.Clone(new Rectangle(minX, minY, maxX - minX + 1, maxY - minY + 1), PixelFormat.Format32bppArgb);
+  }
 
-    Bitmap result = new Bitmap(cw, ch, PixelFormat.Format32bppArgb);
-    BitmapData outData = result.LockBits(new Rectangle(0, 0, cw, ch), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-    byte[] outPx = new byte[cw * ch * 4];
-    for (int y = 0; y < ch; y++) {
-      for (int x = 0; x < cw; x++) {
-        int o = (y * cw + x) * 4;
-        outPx[o] = 255; outPx[o + 1] = 255; outPx[o + 2] = 255;
-        outPx[o + 3] = (byte) red(minX + x, minY + y);
-      }
+  // White silhouette: the coloured hexagon stays opaque, the light speech bubbles become holes
+  public static Bitmap Silhouette (Bitmap src) {
+    int w, h;
+    byte[] px = Read(src, out w, out h);
+    for (int i = 0; i < px.Length; i += 4) {
+      int b = px[i], g = px[i + 1], r = px[i + 2], a = px[i + 3];
+      int light = Math.Min(r, Math.Min(g, b));
+      double hole = Math.Max(0.0, Math.Min(1.0, (light - 60) / 140.0));
+      px[i] = 255; px[i + 1] = 255; px[i + 2] = 255;
+      px[i + 3] = (byte) Math.Round(a * (1.0 - hole));
     }
-    Marshal.Copy(outPx, 0, outData.Scan0, outPx.Length);
-    result.UnlockBits(outData);
-    return result;
+    return Write(px, w, h);
   }
 }
 '@
 
 $Repo = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $Res = Join-Path $Repo 'app\src\main\res'
-$SymbolPath = Join-Path $PSScriptRoot 'simbolo-citmax.png'
-$Brand = [System.Drawing.ColorTranslator]::FromHtml($BackgroundColor)
+$LogoPath = Join-Path $PSScriptRoot 'logo-citchat.png'
+$Background = [System.Drawing.ColorTranslator]::FromHtml($BackgroundColor)
 
-if ($FromRender) {
-  $render = New-Object System.Drawing.Bitmap($FromRender)
-  $extracted = [CitSymbol]::Extract($render)
+if ($FromSvg) {
+  $edge = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+  if (-not (Test-Path $edge)) { $edge = 'C:\Program Files\Microsoft\Edge\Application\msedge.exe' }
+  $work = Join-Path $env:TEMP ('citchat-svg-' + [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Force -Path $work | Out-Null
+  Copy-Item -LiteralPath (Resolve-Path $FromSvg).Path -Destination (Join-Path $work 'logo.svg')
+  $shot = Join-Path $work 'render.png'
+  $url = 'file:///' + ((Join-Path $work 'logo.svg') -replace '\\', '/')
+  $p = Start-Process -FilePath $edge -PassThru -WindowStyle Hidden -ArgumentList @('--headless=new', '--disable-gpu',
+    '--hide-scrollbars', '--default-background-color=00000000', "--user-data-dir=$work\profile",
+    "--screenshot=$shot", '--window-size=2000,2000', $url)
+  if (-not $p.WaitForExit(120000)) { throw 'O Edge nao terminou de renderizar o SVG' }
+  $render = New-Object System.Drawing.Bitmap($shot)
+  $cropped = [CitLogo]::Crop($render)
   $render.Dispose()
-  $extracted.Save($SymbolPath, [System.Drawing.Imaging.ImageFormat]::Png)
-  "Simbolo salvo em $SymbolPath ($($extracted.Width)x$($extracted.Height))"
-  $extracted.Dispose()
+  $cropped.Save($LogoPath, [System.Drawing.Imaging.ImageFormat]::Png)
+  "Logo renderizado em $LogoPath ($($cropped.Width)x$($cropped.Height))"
+  $cropped.Dispose()
 }
-$Symbol = New-Object System.Drawing.Bitmap($SymbolPath)
+
+$Logo = New-Object System.Drawing.Bitmap($LogoPath)
+$Mono = [CitLogo]::Silhouette($Logo)
 
 function New-Canvas([int]$Width, [int]$Height, [string]$Matte) {
   $bmp = New-Object System.Drawing.Bitmap($Width, $Height, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
@@ -109,61 +124,50 @@ function Save-Png($Bitmap, [string]$Path) {
   $Bitmap.Dispose()
 }
 
-# Draws the symbol with the given height, centred on (cx, cy)
-function Draw-Symbol($g, [double]$Height, [double]$CenterX, [double]$CenterY) {
-  $width = $Height * $Symbol.Width / $Symbol.Height
+# Draws an image with the given height, centred on (cx, cy)
+function Draw-Centered($g, $Image, [double]$Height, [double]$CenterX, [double]$CenterY) {
+  $width = $Height * $Image.Width / $Image.Height
   $rect = New-Object System.Drawing.RectangleF([single]($CenterX - $width / 2), [single]($CenterY - $Height / 2), [single]$width, [single]$Height)
-  $g.DrawImage($Symbol, $rect)
+  $g.DrawImage($Image, $rect)
 }
 
-# Launcher icon for API < 26: brand circle (44dp in 48dp) with the white symbol
+# Launcher icon for API < 26: white circle (44dp in 48dp) with the logo
 function New-LauncherIcon([int]$Size, [bool]$FullBleed, [string]$Matte = '') {
   $bmp, $g = New-Canvas $Size $Size $Matte
-  $brush = New-Object System.Drawing.SolidBrush($Brand)
+  $brush = New-Object System.Drawing.SolidBrush($Background)
   if ($FullBleed) {
     $g.FillRectangle($brush, 0, 0, $Size, $Size)
-    Draw-Symbol $g ($Size * 0.58) ($Size / 2) ($Size / 2)
+    Draw-Centered $g $Logo ($Size * 0.78) ($Size / 2) ($Size / 2)
   } else {
     $d = $Size * 44.0 / 48
     $g.FillEllipse($brush, [single](($Size - $d) / 2), [single](($Size - $d) / 2), [single]$d, [single]$d)
-    Draw-Symbol $g ($d * 0.64) ($Size / 2) ($Size / 2)
+    Draw-Centered $g $Logo ($d * 0.8) ($Size / 2) ($Size / 2)
   }
   $g.Dispose()
   return $bmp
 }
 
-# Adaptive icon foreground and monochrome layer: 108dp canvas, symbol 46dp tall (64% of the visible 72dp)
-function New-AdaptiveForeground([double]$Density) {
+# Adaptive icon layers: 108dp canvas, logo 60dp tall (inside the 66dp safe zone)
+function New-AdaptiveLayer($Image, [double]$Density) {
   $size = [int][math]::Round(108 * $Density)
   $bmp, $g = New-Canvas $size $size ''
-  Draw-Symbol $g (46 * $Density) ($size / 2) ($size / 2)
+  Draw-Centered $g $Image (60 * $Density) ($size / 2) ($size / 2)
   $g.Dispose()
   return $bmp
 }
 
-# Status bar icon: white symbol 22dp tall inside 24dp
+# Status bar icon: white silhouette 22dp tall inside 24dp
 function New-NotificationIcon([int]$Size, [string]$Matte = '') {
   $bmp, $g = New-Canvas $Size $Size $Matte
-  Draw-Symbol $g ($Size * 22.0 / 24) ($Size / 2) ($Size / 2)
+  Draw-Centered $g $Mono ($Size * 22.0 / 24) ($Size / 2) ($Size / 2)
   $g.Dispose()
   return $bmp
 }
 
-# Logos drawn by the app itself (passcode, call screen, source code menu), white, tinted by the app
-function New-Logo([int]$CanvasPx, [double]$SymbolPx) {
+# Logos drawn by the app itself (passcode, call screen, source code menu): white, tinted by the app
+function New-Logo([int]$CanvasPx, [double]$LogoPx) {
   $bmp, $g = New-Canvas $CanvasPx $CanvasPx ''
-  Draw-Symbol $g $SymbolPx ($CanvasPx / 2) ($CanvasPx / 2)
-  $g.Dispose()
-  return $bmp
-}
-
-# Intro texture drawn over the brand sphere (IntroRenderer.c: sphere 148x148, texture 82x74 units,
-# anchor (6, -5) moves the texture 6 units left and 5 down, so the symbol is drawn 6 right and 5 up).
-function New-IntroTexture([double]$Density, [string]$Matte = '') {
-  $w = [int][math]::Round(82 * $Density)
-  $h = [int][math]::Round(74 * $Density)
-  $bmp, $g = New-Canvas $w $h $Matte
-  Draw-Symbol $g (60 * $Density) ((41 + 6) * $Density) ((37 - 5) * $Density)
+  Draw-Centered $g $Mono $LogoPx ($CanvasPx / 2) ($CanvasPx / 2)
   $g.Dispose()
   return $bmp
 }
@@ -175,11 +179,20 @@ if (-not $PreviewOnly) {
     Save-Png (New-LauncherIcon ([int](48 * $f)) $false) (Join-Path $Res "mipmap-$d\app_launcher.png")
     Save-Png (New-LauncherIcon ([int](48 * $f)) $false) (Join-Path $Res "mipmap-$d\app_launcher_round.png")
     Save-Png (New-NotificationIcon ([int](24 * $f))) (Join-Path $Res "mipmap-$d\app_notification.png")
-    Save-Png (New-AdaptiveForeground $f) (Join-Path $Res "mipmap-$d\citchat_adaptive_fg.png")
+    Save-Png (New-AdaptiveLayer $Logo $f) (Join-Path $Res "mipmap-$d\citchat_adaptive_fg.png")
+    Save-Png (New-AdaptiveLayer $Mono $f) (Join-Path $Res "mipmap-$d\citchat_adaptive_mono.png")
     if ($d -ne 'xxxhdpi') {
-      Save-Png (New-IntroTexture $f) (Join-Path $Res "drawable-$d\intro_tg_plane.png")
+      # The intro shows the logo in place of the sphere (IntroController.getSphereBitmap); nothing flies over it
+      $w = [int][math]::Round(82 * $f); $h = [int][math]::Round(74 * $f)
+      $empty, $g = New-Canvas $w $h ''
+      $g.Dispose()
+      Save-Png $empty (Join-Path $Res "drawable-$d\intro_tg_plane.png")
     }
   }
+  $intro, $g = New-Canvas ([int][math]::Ceiling(900 * $Logo.Width / $Logo.Height)) 900 ''
+  Draw-Centered $g $Logo 900 ($intro.Width / 2) 450
+  $g.Dispose()
+  Save-Png $intro (Join-Path $Res 'drawable-nodpi\citchat_intro_logo.png')
   # xxhdpi (3x) versions; Android scales them for other densities
   Save-Png (New-Logo 168 155) (Join-Path $Res 'drawable-xxhdpi\deproko_logo_telegram_passcode_56.png')
   Save-Png (New-Logo 54 51) (Join-Path $Res 'drawable-xxhdpi\deproko_logo_telegram_18.png')
@@ -190,18 +203,13 @@ if (-not $PreviewOnly) {
 
 if ($PreviewDir) {
   New-Item -ItemType Directory -Force -Path $PreviewDir | Out-Null
-  Save-Png (New-LauncherIcon 192 $false '#FFFFFF') (Join-Path $PreviewDir 'launcher-192.png')
+  Save-Png (New-LauncherIcon 192 $false '#D9E3E3') (Join-Path $PreviewDir 'launcher-192.png')
   Save-Png (New-NotificationIcon 96 '#37474F') (Join-Path $PreviewDir 'notification-96.png')
-  $s = 3.0
-  $bmp, $g = New-Canvas 540 540 '#FFFFFF'
-  $bg = New-Object System.Drawing.SolidBrush($Brand)
-  $r = 148 * $s
-  $g.FillEllipse($bg, [single](270 - $r / 2), [single](270 - $r / 2), [single]$r, [single]$r)
-  $tex = New-IntroTexture $s
-  $g.DrawImage($tex, [single](270 - $tex.Width / 2 - 6 * $s), [single](270 - $tex.Height / 2 + 5 * $s))
-  $tex.Dispose()
+  $monoPreview, $g = New-Canvas 216 216 '#37474F'
+  Draw-Centered $g $Mono 120 108 108
   $g.Dispose()
-  Save-Png $bmp (Join-Path $PreviewDir 'intro-sphere.png')
+  Save-Png $monoPreview (Join-Path $PreviewDir 'monochrome.png')
   "Previas em $PreviewDir"
 }
-$Symbol.Dispose()
+$Mono.Dispose()
+$Logo.Dispose()

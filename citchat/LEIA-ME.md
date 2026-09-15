@@ -17,7 +17,7 @@ As mudanças no código do Telegram X foram mantidas pequenas, para facilitar re
 | Área | Mudança |
 |---|---|
 | Nome | `app.name=CITchat` no build. `core/Branding.java` troca "Telegram X" pelo nome do app em todos os textos, inclusive nas traduções baixadas de translations.telegram.org |
-| Ícones | Símbolo oficial da CITmax (hexágono com circuito, versão negativa da página 26 do Manual da marca) no launcher, no ícone adaptativo e monocromático, na notificação, na animação da introdução e nas telas de senha e de chamada. O logo do Telegram foi removido |
+| Ícones | Logo do CITchat (`citchat/branding/logo-citchat.svg`: hexágono CITmax com balões de conversa) no launcher (fundo branco) e no ícone adaptativo; a silhueta do logo é usada na notificação, no ícone monocromático e nas telas de senha e de chamada. Na introdução, o logo aparece no lugar da esfera do Telegram. O logo do Telegram foi removido |
 | Cores | Paleta do Manual da marca nos temas claro (padrão) e escuro: cabeçalho em Conexão profunda `#036271`, destaques e botão flutuante em Inovação `#00C896`, ícones e confirmações em Tecnologia em movimento `#008B87`. Aplicada por `citchat/branding/aplicar-paleta.ps1`. O fundo das conversas é liso, sem o padrão do Telegram |
 | Introdução | A primeira página avisa que o CITchat é um cliente não oficial que usa a API do Telegram (exigência dos termos da API) |
 | Atualizações | O atualizador só aceita APKs com o nome `CITchat-*`, então não oferece mais builds do Telegram X |
@@ -75,9 +75,9 @@ notificações push** com o app fechado.
 - **Mapas:** a chave do Google Maps no `AndroidManifest.xml` é do Telegram X e não funciona com o
   pacote novo. Criar uma chave própria.
 - **Fontes:** o Manual da marca usa Righteous (fonte da marca) e Montserrat (apoio); o app ainda usa Roboto.
-- **Ícone:** gerado a partir de `citchat/branding/simbolo-citmax.png` por
-  `citchat\branding\gerar-icones.ps1`. Para recriar o símbolo, renderize a página 26 do Manual e rode
-  o script com `-FromRender`.
+- **Logo:** para trocar, substitua `citchat/branding/logo-citchat.svg` e rode
+  `powershell -ExecutionPolicy Bypass -File citchat\branding\gerar-icones.ps1 -FromSvg citchat\branding\logo-citchat.svg`
+  (o SVG é renderizado pelo Microsoft Edge e todos os ícones são gerados de novo).
 
 ## Termos da API do Telegram (resumo)
 
