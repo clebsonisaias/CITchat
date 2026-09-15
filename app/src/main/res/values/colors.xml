@@ -4,10 +4,10 @@
   <color name="swirl_ridgeColor">#ff000000</color>
   <color name="swirl_errorColor">#ff000000</color>
 
-  <color name="splash">#FFFDFCF5</color>
+  <color name="splash">#FFFFFFFF</color>
   <color name="navigation_bar">#ff000000</color>
-  <color name="status_bar">#FF0D1F1C</color>
-  <color name="apps_list">#FF0D1F1C</color>
+  <color name="status_bar">#FF024E5A</color>
+  <color name="apps_list">#FF036271</color>
 
   <!-- differ in colors/values-v21 -->
 </resources>

@@ -1,4 +1,4 @@
-# Aplica a paleta da CITmax (citmax.com.br) aos temas do Telegram X.
+# Aplica a paleta do Manual da marca CITmax aos temas do Telegram X.
 #
 #   powershell -ExecutionPolicy Bypass -File citchat\branding\aplicar-paleta.ps1
 #
@@ -10,16 +10,11 @@ $ErrorActionPreference = 'Stop'
 
 $Themes = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path 'app\src\main\other\themes'
 
-# Paleta do site (variaveis CSS)
-$P  = '#00C896'   # --brand-primary
-$M  = '#008B87'   # --brand-mid
-$D  = '#036271'   # --brand-deep
-$L  = '#D8FF3E'   # --brand-accent (lime)
-$I  = '#0D1F1C'   # --ink
-$I2 = '#12302A'   # --ink-2
-$C  = '#FDFCF5'   # --cream
-$LN = '#E4E7DD'   # --line
-$MU = '#657370'   # --muted
+# Manual da marca CITmax, "Padroes - Cores"
+$C1 = '#00C896'   # Inovacao (cor 1), Pantone 3395 U
+$C2 = '#008B87'   # Tecnologia em movimento (cor 2), Pantone 327 U
+$C3 = '#036271'   # Conexao profunda (cor 3), Pantone 3155 C
+$W  = '#FFFFFF'   # Pureza digital
 
 function Expand([hashtable]$Groups) {
   $map = [ordered]@{}
@@ -33,97 +28,98 @@ function Expand([hashtable]$Groups) {
   return $map
 }
 
+# Tema claro: cabecalho em Conexao profunda, destaques em Inovacao, icones em Tecnologia em movimento
 $Light = Expand @{
-  'headerBackground, passcode' = $I
-  'notification, notificationLink, notificationPlayer, headerBarCallActive' = $P
-  'headerBadge, headerTabActive' = $L
-  'controlActive, themeBlue, themeClassic, fillingPositive, checkActive, chatListVerify, sliderActive, inputActive' = $P
-  'togglerActive, togglerPositive, promo, profileSectionActive, seekDone, messageSwipeBackground, online' = $P
-  'bubbleOut_waveformActive, waveformActive' = $P
-  'fillingPositiveContent, checkContent, badgeText' = $I
-  'circleButtonActive, circleButtonRegular, circleButtonTheme, snackbarUpdate, badge, tooltip_textLink' = $L
-  'circleButtonActiveIcon, circleButtonRegularIcon, circleButtonThemeIcon, snackbarUpdateText, snackbarUpdateAction' = $I
-  'chatSendButton, progress, bubbleIn_progress, iconActive, ticks, ticksRead, chatListAction, textSearchQueryHighlight' = $M
-  'profileSectionActiveContent, playerButtonActive, bubbleOut_ticks, bubbleOut_ticksRead' = $M
-  'bubbleOut_inlineOutline, inlineOutline, bubbleOut_chatCorrectChosenFilling, bubbleOut_chatCorrectFilling, bubbleOut_chatVerticalLine' = $M
-  'bubbleOut_inlineIcon, inlineIcon, messageCorrectChosenFilling, messageCorrectFilling, messageVerticalLine' = $M
-  'bubbleOut_file, file, bubbleOut_fillingPositive, bubbleOut_fillingPositive_overlay, bubbleIn_fillingPositive, bubbleIn_fillingPositive_overlay' = $M
-  'avatarArchive, avatarReplies, avatarReplies_big, avatarSavedMessages, avatarSavedMessages_big' = $M
-  'textLink, bubbleIn_textLink, bubbleOut_textLink, iv_textLink, iv_textMarkedLink, textNeutral, unreadText' = $D
-  'bubbleOut_inlineText, bubbleOut_messageAuthor, inlineText, messageAuthor' = $D
+  'headerBackground, passcode' = $C3
+  'notification, notificationLink, notificationPlayer, headerBarCallActive, headerBadge, headerTabActive' = $C1
+  'controlActive, themeBlue, themeClassic, fillingPositive, checkActive, chatListVerify, sliderActive, inputActive' = $C1
+  'togglerActive, togglerPositive, promo, profileSectionActive, seekDone, messageSwipeBackground, online' = $C1
+  'bubbleOut_waveformActive, waveformActive' = $C1
+  'circleButtonActive, circleButtonRegular, circleButtonTheme, snackbarUpdate, badge, tooltip_textLink' = $C1
+  'circleButtonActiveIcon, circleButtonRegularIcon, circleButtonThemeIcon' = $W
+  'fillingPositiveContent, checkContent, badgeText, snackbarUpdateText, snackbarUpdateAction' = $C3
+  'chatSendButton, progress, bubbleIn_progress, iconActive, ticks, ticksRead, chatListAction, textSearchQueryHighlight' = $C2
+  'profileSectionActiveContent, playerButtonActive, bubbleOut_ticks, bubbleOut_ticksRead' = $C2
+  'bubbleOut_inlineOutline, inlineOutline, bubbleOut_chatCorrectChosenFilling, bubbleOut_chatCorrectFilling, bubbleOut_chatVerticalLine' = $C2
+  'bubbleOut_inlineIcon, inlineIcon, messageCorrectChosenFilling, messageCorrectFilling, messageVerticalLine' = $C2
+  'bubbleOut_file, file, bubbleOut_fillingPositive, bubbleOut_fillingPositive_overlay, bubbleIn_fillingPositive, bubbleIn_fillingPositive_overlay' = $C2
+  'avatarArchive, avatarReplies, avatarReplies_big, avatarSavedMessages, avatarSavedMessages_big' = $C2
+  'textLink, bubbleIn_textLink, bubbleOut_textLink, iv_textLink, iv_textMarkedLink, textNeutral, unreadText' = $C3
+  'bubbleOut_inlineText, bubbleOut_messageAuthor, inlineText, messageAuthor' = $C3
   'textLinkPressHighlight, bubbleIn_textLinkPressHighlight, bubbleOut_textLinkPressHighlight, iv_textLinkPressHighlight' = '#03627130'
-  'tooltip_textLinkPressHighlight' = '#D8FF3E44'
+  'tooltip_textLinkPressHighlight' = '#00C89644'
   'togglerActiveBackground, togglerPositiveBackground' = '#9FE7D2'
   'textSelectionHighlight' = '#BDEFDF'
-  'unread' = '#E6F4EE'
+  'unread' = '#E3F4F1'
   'messageSelection' = '#00C89612'
   'bubble_messageSelection, bubble_messageSelectionNoWallpaper' = '#00C89633'
-  'bubbleOut_waveformInactive, waveformInactive' = '#CFE9DF'
-  'background, iv_chatLinkBackground, iv_textReferenceBackground, chatKeyboard' = '#F3F2EA'
-  'chatKeyboardButton, bubbleIn_separator, chatSeparator, inputInactive, iv_separator, separator' = $LN
-  'bubble_chatSeparator, shareSeparator' = '#E4E7DDAA'
-  'chatBackground' = '#ECEFE6'
-  'bubbleOut_background' = '#D9F6EC'
-  'bubbleIn_outline, bubbleOut_outline' = '#C9DDD3'
-  'bubbleOut_progress, bubbleOut_separator, bubbleOut_time' = '#6E978A'
+  'bubbleOut_waveformInactive, waveformInactive' = '#CDE7E4'
+  'background, iv_chatLinkBackground, iv_textReferenceBackground, chatKeyboard' = '#F1F5F5'
+  'chatKeyboardButton, bubbleIn_separator, chatSeparator, inputInactive, iv_separator, separator' = '#DCE6E6'
+  'bubble_chatSeparator, shareSeparator' = '#DCE6E6AA'
+  'chatBackground' = '#E6EEEE'
+  'bubbleOut_background' = '#D5F4EA'
+  'bubbleIn_outline, bubbleOut_outline' = '#C5DAD9'
+  'bubbleOut_progress, bubbleOut_separator, bubbleOut_time' = '#5F8F86'
   'bubbleOut_fillingActive' = '#008B871A'
-  'text, bubbleIn_text, bubbleOut_text' = $I
-  'textLight' = $MU
-  'icon, headerLightIcon, controlInactive' = '#6E7B77'
-  'background_text' = '#5A6864'
-  'background_textLight' = '#6F7C78'
-  'background_icon' = '#93A09B'
-  'chatListIcon, chatListMute' = '#A9B3AF'
-  'bubbleIn_time, textPlaceholder' = '#9AA6A1'
-  'iconLight' = '#A0ABA7'
-  'fillingPressed' = '#F1F2EC'
-  'themeNightBlue' = $I2
+  'text, bubbleIn_text, bubbleOut_text' = '#10272B'
+  'textLight' = '#5E7478'
+  'icon, headerLightIcon, controlInactive' = '#6B7F82'
+  'background_text' = '#566B6E'
+  'background_textLight' = '#6B7F82'
+  'background_icon' = '#8FA3A5'
+  'chatListIcon, chatListMute' = '#A6B5B7'
+  'bubbleIn_time, textPlaceholder' = '#98A8AA'
+  'iconLight' = '#9EAEB0'
+  'fillingPressed' = '#EEF3F3'
+  'themeNightBlue' = '#06363F'
 }
 
+# Tema escuro: fundos derivados de Conexao profunda, destaques em Inovacao
 $Dark = Expand @{
-  'filling, bubbleIn_background, circleButtonChat, circleButtonOverlay, overlayFilling, unread' = $I2
-  'attachContact, attachFile, attachInlineBot, attachLocation, attachPhoto, bubble_mediaReply_noWallpaper, bubble_unread_noWallpaper' = $I2
-  'background, chatBackground, chatKeyboard, iv_chatLinkBackground, iv_preBlockBackground, iv_textCodeBackground, iv_textCodeBackgroundPressed' = $I
-  'headerBackground, headerLightBackground, notificationPlayer, passcode, chatKeyboardButton' = '#163A33'
-  'background_icon, badgeMuted, bubbleIn_time, circleButtonChatIcon, circleButtonOverlayIcon, icon, iv_caption, iv_icon' = '#8FA39D'
-  'iv_pageAuthor, iv_pageFooter, textLight, textPlaceholder, headerBadgeMuted, iv_pageSubtitle' = '#8FA39D'
-  'background_text, background_textLight' = '#879A94'
-  'chatListAction, chatListVerify, checkActive, iconActive, seekDone, sliderActive, ticks, ticksRead' = $P
-  'bubbleIn_progress, chatSendButton, controlActive, inputActive, profileSectionActive, profileSectionActiveContent, progress, promo' = $P
-  'textNeutral, textSearchQueryHighlight, togglerActive, togglerPositive, notification, notificationLink, headerButton' = $P
-  'bubbleIn_textLink, iv_textLink, iv_textMarkedLink, messageAuthor, textLink, messageCorrectChosenFilling, messageCorrectFilling' = $P
-  'inlineIcon, inlineOutline, inlineText, playerButtonActive, file, bubbleOut_file' = $P
-  'bubbleIn_fillingPositive, bubbleIn_fillingPositive_overlay, bubbleOut_fillingPositive, bubbleOut_fillingPositive_overlay' = $P
-  'badge, headerBadge, circleButtonActive, circleButtonRegular, circleButtonTheme, snackbarUpdate, bubbleOut_ticksRead' = $L
-  'bubbleOut_chatCorrectChosenFilling, bubbleOut_chatCorrectFilling, bubbleOut_chatVerticalLine, bubbleOut_inlineIcon' = $L
-  'bubbleOut_inlineOutline, bubbleOut_inlineText, bubbleOut_messageAuthor, bubbleOut_textLink, bubbleOut_ticks, bubbleOut_waveformActive' = $L
-  'bubbleOut_background, messageSwipeBackground' = $D
-  'text, bubbleIn_text, bubbleOut_text' = $C
-  'bubble_chatSeparator, bubbleIn_outline, bubbleIn_separator, bubbleOut_outline, chatSeparator, inputInactive, iv_separator, separator, shareSeparator' = '#081512'
-  'bubble_date, bubble_date_noWallpaper, bubble_overlay' = '#0D1F1C99'
+  'filling, bubbleIn_background, circleButtonChat, circleButtonOverlay, overlayFilling, unread' = '#06363F'
+  'attachContact, attachFile, attachInlineBot, attachLocation, attachPhoto, bubble_mediaReply_noWallpaper, bubble_unread_noWallpaper' = '#06363F'
+  'background, chatBackground, chatKeyboard, iv_chatLinkBackground, iv_preBlockBackground, iv_textCodeBackground, iv_textCodeBackgroundPressed' = '#042A31'
+  'headerBackground, headerLightBackground, notificationPlayer, passcode, chatKeyboardButton' = '#054A55'
+  'background_icon, badgeMuted, bubbleIn_time, circleButtonChatIcon, circleButtonOverlayIcon, icon, iv_caption, iv_icon' = '#8AA3A6'
+  'iv_pageAuthor, iv_pageFooter, textLight, textPlaceholder, headerBadgeMuted, iv_pageSubtitle' = '#8AA3A6'
+  'background_text, background_textLight' = '#85A0A3'
+  'chatListAction, chatListVerify, checkActive, iconActive, seekDone, sliderActive, ticks, ticksRead' = $C1
+  'bubbleIn_progress, chatSendButton, controlActive, inputActive, profileSectionActive, profileSectionActiveContent, progress, promo' = $C1
+  'textNeutral, textSearchQueryHighlight, togglerActive, togglerPositive, notification, notificationLink, headerButton' = $C1
+  'bubbleIn_textLink, iv_textLink, iv_textMarkedLink, messageAuthor, textLink, messageCorrectChosenFilling, messageCorrectFilling' = $C1
+  'inlineIcon, inlineOutline, inlineText, playerButtonActive, file, bubbleOut_file' = $C1
+  'bubbleIn_fillingPositive, bubbleIn_fillingPositive_overlay, bubbleOut_fillingPositive, bubbleOut_fillingPositive_overlay' = $C1
+  'badge, headerBadge, circleButtonActive, circleButtonRegular, circleButtonTheme, snackbarUpdate' = $C1
+  'bubbleOut_chatCorrectChosenFilling, bubbleOut_chatCorrectFilling, bubbleOut_chatVerticalLine, bubbleOut_inlineIcon, bubbleOut_ticksRead' = '#7FE6C8'
+  'bubbleOut_inlineOutline, bubbleOut_inlineText, bubbleOut_messageAuthor, bubbleOut_textLink, bubbleOut_ticks, bubbleOut_waveformActive' = '#7FE6C8'
+  'bubbleOut_background, messageSwipeBackground' = $C3
+  'text, bubbleIn_text, bubbleOut_text' = '#F2F7F7'
+  'bubble_chatSeparator, bubbleIn_outline, bubbleIn_separator, bubbleOut_outline, chatSeparator, inputInactive, iv_separator, separator, shareSeparator' = '#03222A'
+  'bubble_date, bubble_date_noWallpaper, bubble_overlay' = '#042A3199'
   'textLinkPressHighlight, bubbleIn_textLinkPressHighlight, iv_textLinkPressHighlight' = '#00C89644'
-  'bubbleOut_textLinkPressHighlight' = '#D8FF3E40'
-  'bubbleOut_progress, bubbleOut_separator, bubbleOut_time' = '#9CCFC2'
-  'bubbleOut_waveformInactive, waveformInactive' = '#4E8C7D'
-  'waveformActive' = '#2F7F6E'
-  'chatListIcon, chatListMute, togglerInactive' = '#82968F'
-  'controlInactive, sliderInactive, togglerInactiveBackground' = '#3D5751'
-  'fileAttach, playerCoverPlaceholder' = '#0A1916'
-  'fillingPressed' = '#173B34'
-  'iconLight' = '#4F615C'
+  'bubbleOut_textLinkPressHighlight' = '#7FE6C840'
+  'bubbleOut_progress, bubbleOut_separator, bubbleOut_time' = '#A5D9D1'
+  'bubbleOut_waveformInactive, waveformInactive' = '#3F8A87'
+  'waveformActive' = '#2E8F88'
+  'chatListIcon, chatListMute, togglerInactive' = '#7F9A9D'
+  'controlInactive, sliderInactive, togglerInactiveBackground' = '#3A5B60'
+  'fileAttach, playerCoverPlaceholder' = '#032329'
+  'fillingPressed' = '#0B414B'
+  'iconLight' = '#4D666A'
   'messageSelection' = '#00C89614'
-  'messageVerticalLine' = $M
-  'playerCoverIcon' = '#6F837D'
-  'seekEmpty' = '#0A1714'
-  'seekReady' = '#1F4A40'
-  'textSelectionHighlight' = '#1E4A40'
-  'togglerActiveBackground, togglerPositiveBackground' = '#0F6E5A'
+  'messageVerticalLine' = $C2
+  'playerCoverIcon' = '#6C8A8D'
+  'seekEmpty' = '#03222A'
+  'seekReady' = '#1B525A'
+  'textSelectionHighlight' = '#17545C'
+  'togglerActiveBackground, togglerPositiveBackground' = '#0D6C66'
   'tooltip_outline' = '#03627120'
-  'fillingActive, bubbleIn_fillingActive' = '#8FA39D26'
-  'bubbleOut_fillingActive' = '#9CCFC226'
-  'blockQuoteText, blockQuoteLine' = '#A9C2BA'
-  'bubbleIn_blockQuoteText, bubbleIn_blockQuoteLine' = '#93ABA3'
-  'bubbleOut_blockQuoteText, bubbleOut_blockQuoteLine' = '#BFE9DC'
+  'fillingActive, bubbleIn_fillingActive' = '#8AA3A626'
+  'bubbleOut_fillingActive' = '#A5D9D126'
+  'blockQuoteText, blockQuoteLine' = '#A7C3C5'
+  'bubbleIn_blockQuoteText, bubbleIn_blockQuoteLine' = '#91AEB1'
+  'bubbleOut_blockQuoteText, bubbleOut_blockQuoteLine' = '#BFE9E3'
 }
 
 function Read-Theme([string]$Path) {

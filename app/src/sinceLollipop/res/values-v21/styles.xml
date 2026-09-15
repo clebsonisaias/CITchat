@@ -29,10 +29,10 @@
   </style>
 
   <style name="DatePickerTheme" parent="android:style/Widget.Material.Light.DatePicker">
-    <item name="android:headerBackground">#ff0d1f1c</item>
+    <item name="android:headerBackground">#ff036271</item>
   </style>
   <style name="TimePickerTheme" parent="android:style/Widget.Material.Light.TimePicker">
-    <item name="android:headerBackground">#ff0d1f1c</item>
+    <item name="android:headerBackground">#ff036271</item>
   </style>
   <style name="LightEditTextTheme" parent="android:Theme.Material.Light.NoActionBar">
     <item name="android:colorControlActivated">#ffdadada</item>
@@ -45,10 +45,10 @@
     <item name="android:textColorLink">#ff008b87</item>
   </style>
   <style name="DialogThemeDark" parent="@android:style/Theme.Material.Dialog.Alert">
-    <item name="android:headerBackground">#ff163a33</item>
+    <item name="android:headerBackground">#ff054a55</item>
     <item name="android:colorAccent">#ff00c896</item>
     <item name="android:textColorLink">#ff00c896</item>
-    <item name="android:colorBackground">#ff12302a</item>
+    <item name="android:colorBackground">#ff06363f</item>
   </style>
 
   <style name="WhiteRecyclerTheme" parent="@style/AppTheme">
