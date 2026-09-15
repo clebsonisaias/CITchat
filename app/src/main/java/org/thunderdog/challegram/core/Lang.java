@@ -333,7 +333,8 @@ public class Lang {
 
   private static String getAndroidString (@StringRes int resId) throws Resources.NotFoundException {
     // TODO non-current languagePackInfo
-    return Branding.apply(UI.getAppContext().getResources().getString(resId));
+    String value = UI.getAppContext().getResources().getString(resId);
+    return Branding.needsKey(value) ? Branding.apply(getResourceEntryName(resId), value) : value;
   }
 
   private static String getAndroidString (@StringRes int resId, Object... formatArgs) {
@@ -3687,7 +3688,7 @@ public class Lang {
     TdApi.LanguagePackStringValueOrdinary string = queryTdlibStringValue(key, language.id);
     if (string == null && !StringUtils.isEmpty(language.baseLanguagePackId))
       string = queryTdlibStringValue(key, language.baseLanguagePackId);
-    Branding.apply(string);
+    Branding.apply(key, string);
     if (cacheKey != null) {
       putCachedString(cacheKey, string);
     }
@@ -3723,7 +3724,7 @@ public class Lang {
     TdApi.LanguagePackStringValuePluralized string = queryTdlibStringPluralized(key, language.id);
     if (string == null && !StringUtils.isEmpty(language.baseLanguagePackId))
       string = queryTdlibStringPluralized(key, language.baseLanguagePackId);
-    Branding.apply(string);
+    Branding.apply(key, string);
     if (cacheKey != null) {
       putCachedString(cacheKey, string);
     }

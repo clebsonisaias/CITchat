@@ -16,14 +16,46 @@ import androidx.annotation.Nullable;
 import org.drinkless.tdlib.TdApi;
 import org.thunderdog.challegram.BuildConfig;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Bundled strings and the strings downloaded from the Telegram X translation platform
  * (translations.telegram.org/.../android_x) call the app "Telegram X". Forks built with a
  * different {@code app.name} replace that name with {@link BuildConfig#PROJECT_NAME}.
+ *
+ * <p>Plain "Telegram" is only replaced in the strings listed in {@link #APP_NAME_KEYS}, where it
+ * means this app. Everywhere else it refers to the Telegram service (accounts, servers, Premium,
+ * support, terms, contacts using Telegram) and must stay, so users can tell what belongs to Telegram.
  */
 public final class Branding {
   private static final String UPSTREAM_NAME = "Telegram X";
-  private static final boolean ENABLED = !BuildConfig.PROJECT_NAME.contains(UPSTREAM_NAME);
+  private static final String SERVICE_NAME = "Telegram";
+  private static final boolean ENABLED = !BuildConfig.PROJECT_NAME.contains(SERVICE_NAME);
+
+  private static final Set<String> APP_NAME_KEYS = new HashSet<>(Arrays.asList(
+    // Intro pages and demo chat
+    "Page2Message", "Page3Message", "Page4Message", "Page5Message", "Page6Message",
+    "json_3_text1", "json_3_text2",
+    // Contacts sync prompt
+    "SyncHintTitle2",
+    // Calls
+    "VoipBranding", "VoipInCallBranding", "CallBrandingIncoming", "VoipRateCallAlert",
+    // Notifications, settings and local data
+    "NotificationsGuideBlockedApp", "NotificationsGuideBlockedAll", "NotificationsGuidePermission",
+    "ChangePasscodeInfo", "OptimizingInfo", "ApplicationFolderWarning", "ProxySponsorAlert",
+    // Login by phone call is handled by the app
+    "SentCallOnly",
+    // Invitations use the app download link
+    "NoChatsText",
+    "InviteTextCommonMany", "InviteTextCommonMany_one", "InviteTextCommonMany_other", "InviteTextCommonOverThousand"
+  ));
+
+  // "Telegram" as a word, not inside a link, an e-mail address or a username (telegram.org, @telegram)
+  private static final Pattern SERVICE_WORD = Pattern.compile("(?<![\\w@/.])" + SERVICE_NAME + "(?!\\w|\\.(?:org|me|dog|ph)\\b)");
 
   private Branding () { }
 
@@ -34,29 +66,42 @@ public final class Branding {
     return value;
   }
 
+  /** True when {@link #apply(String, String)} may change more than {@link #apply(String)}, so the string key is needed. */
+  public static boolean needsKey (@Nullable String value) {
+    return ENABLED && value != null && value.contains(SERVICE_NAME);
+  }
+
+  public static String apply (@Nullable String key, String value) {
+    value = apply(value);
+    if (ENABLED && key != null && value != null && APP_NAME_KEYS.contains(key) && value.contains(SERVICE_NAME)) {
+      value = SERVICE_WORD.matcher(value).replaceAll(Matcher.quoteReplacement(BuildConfig.PROJECT_NAME));
+    }
+    return value;
+  }
+
   public static TdApi.LanguagePackString apply (TdApi.LanguagePackString string) {
     if (string.value instanceof TdApi.LanguagePackStringValueOrdinary) {
-      apply((TdApi.LanguagePackStringValueOrdinary) string.value);
+      apply(string.key, (TdApi.LanguagePackStringValueOrdinary) string.value);
     } else if (string.value instanceof TdApi.LanguagePackStringValuePluralized) {
-      apply((TdApi.LanguagePackStringValuePluralized) string.value);
+      apply(string.key, (TdApi.LanguagePackStringValuePluralized) string.value);
     }
     return string;
   }
 
-  public static void apply (@Nullable TdApi.LanguagePackStringValueOrdinary string) {
+  public static void apply (@Nullable String key, @Nullable TdApi.LanguagePackStringValueOrdinary string) {
     if (string != null) {
-      string.value = apply(string.value);
+      string.value = apply(key, string.value);
     }
   }
 
-  public static void apply (@Nullable TdApi.LanguagePackStringValuePluralized string) {
+  public static void apply (@Nullable String key, @Nullable TdApi.LanguagePackStringValuePluralized string) {
     if (string != null) {
-      string.zeroValue = apply(string.zeroValue);
-      string.oneValue = apply(string.oneValue);
-      string.twoValue = apply(string.twoValue);
-      string.fewValue = apply(string.fewValue);
-      string.manyValue = apply(string.manyValue);
-      string.otherValue = apply(string.otherValue);
+      string.zeroValue = apply(key, string.zeroValue);
+      string.oneValue = apply(key, string.oneValue);
+      string.twoValue = apply(key, string.twoValue);
+      string.fewValue = apply(key, string.fewValue);
+      string.manyValue = apply(key, string.manyValue);
+      string.otherValue = apply(key, string.otherValue);
     }
   }
 }
