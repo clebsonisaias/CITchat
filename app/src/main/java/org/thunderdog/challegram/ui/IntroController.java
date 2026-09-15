@@ -1854,7 +1854,9 @@ public class IntroController extends ViewController<Void> implements GLSurfaceVi
     int size = Screen.dp(220f);
     bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
     Canvas c = new Canvas(bitmap);
-    // CITchat: the app logo takes the place of the Telegram sphere
+    // CITchat: the app logo takes the place of the Telegram sphere. The sphere must stay an opaque circle:
+    // the renderer draws the next page's body (a dark circle of the same size) underneath it
+    c.drawCircle(size / 2f, size / 2f, size / 2f, Paints.fillingPaint(Theme.fillingColor()));
     Bitmap logo = getTextureBitmap(R.drawable.citchat_intro_logo);
     float logoHeight = size * .96f;
     float logoWidth = logoHeight * logo.getWidth() / logo.getHeight();
