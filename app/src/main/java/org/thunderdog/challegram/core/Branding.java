@@ -59,16 +59,30 @@ public final class Branding {
 
   private Branding () { }
 
+  // Telegram X community chats mentioned in help texts, and what the fork shows instead
+  private static final String UPSTREAM_UPDATES_LINK = "https://t.me/tgx_log";
+  private static final String UPSTREAM_UPDATES_CHANNEL = "@tgx_log";
+  private static final String UPSTREAM_SUPPORT_CHAT = "@tgandroidtests";
+
   public static String apply (String value) {
-    if (ENABLED && value != null && value.contains(UPSTREAM_NAME)) {
-      return value.replace(UPSTREAM_NAME, BuildConfig.PROJECT_NAME);
+    if (!ENABLED || value == null) {
+      return value;
+    }
+    if (value.contains(UPSTREAM_NAME)) {
+      value = value.replace(UPSTREAM_NAME, BuildConfig.PROJECT_NAME);
+    }
+    if (value.contains("tgx_log")) {
+      value = value.replace(UPSTREAM_UPDATES_LINK, BuildConfig.DOWNLOAD_URL).replace(UPSTREAM_UPDATES_CHANNEL, BuildConfig.DOWNLOAD_URL);
+    }
+    if (value.contains(UPSTREAM_SUPPORT_CHAT)) {
+      value = value.replace(UPSTREAM_SUPPORT_CHAT, BuildConfig.REMOTE_URL + "/issues");
     }
     return value;
   }
 
-  /** True when {@link #apply(String, String)} may change more than {@link #apply(String)}, so the string key is needed. */
+  /** True when the string may need branding, so the caller should look up its key and call {@link #apply(String, String)}. */
   public static boolean needsKey (@Nullable String value) {
-    return ENABLED && value != null && value.contains(SERVICE_NAME);
+    return ENABLED && value != null && (value.contains(SERVICE_NAME) || value.contains("tgx_log") || value.contains(UPSTREAM_SUPPORT_CHAT));
   }
 
   public static String apply (@Nullable String key, String value) {
