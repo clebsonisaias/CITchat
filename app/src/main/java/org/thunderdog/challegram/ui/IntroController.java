@@ -1854,7 +1854,7 @@ public class IntroController extends ViewController<Void> implements GLSurfaceVi
     int size = Screen.dp(220f);
     bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
     Canvas c = new Canvas(bitmap);
-    c.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2, bitmap.getWidth() / 2, Paints.fillingPaint(0xff0e7c86)); // CITchat brand colour (R.color.citchat_brand)
+    c.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2, bitmap.getWidth() / 2, Paints.fillingPaint(0xff00c896)); // CITchat brand colour (R.color.citchat_brand)
     U.recycle(c);
     synchronized (icons) {
       iconsSpecial.put(0, bitmap);

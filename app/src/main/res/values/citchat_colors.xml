@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- CITchat brand colours -->
-  <color name="citchat_brand">#FF0E7C86</color>
-  <color name="citchat_accent">#FFFF8A3D</color>
-  <color name="citchat_launcher_background">#FF0E7C86</color>
+  <!-- CITmax brand colours (citmax.com.br). Theme colours live in app/src/main/other/themes, see citchat/branding/aplicar-paleta.ps1 -->
+  <color name="citchat_brand">#FF00C896</color>
+  <color name="citchat_brand_mid">#FF008B87</color>
+  <color name="citchat_brand_deep">#FF036271</color>
+  <color name="citchat_accent">#FFD8FF3E</color>
+  <color name="citchat_ink">#FF0D1F1C</color>
+  <color name="citchat_cream">#FFFDFCF5</color>
+  <color name="citchat_launcher_background">#FF00C896</color>
 </resources>

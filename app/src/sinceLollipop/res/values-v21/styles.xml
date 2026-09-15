@@ -5,7 +5,7 @@
     <item name="android:windowActionBarOverlay">true</item>
     <item name="android:colorPrimaryDark">@color/status_bar</item> <!-- status bar color -->
     <item name="android:colorPrimary">@color/apps_list</item> <!-- launched apps list -->
-    <item name="android:colorControlActivated">#ff5b95c2</item>
+    <item name="android:colorControlActivated">#ff00c896</item>
     <item name="android:datePickerStyle">@style/DatePickerTheme</item>
     <item name="android:datePickerDialogTheme">@style/DialogTheme</item>
     <item name="android:timePickerStyle">@style/TimePickerTheme</item>
@@ -19,7 +19,7 @@
     <item name="android:windowActionBarOverlay">true</item>
     <item name="android:colorPrimaryDark">@color/status_bar</item> <!-- status bar color -->
     <item name="android:colorPrimary">@color/apps_list</item> <!-- launched apps list -->
-    <item name="android:colorControlActivated">#ff5b95c2</item>
+    <item name="android:colorControlActivated">#ff00c896</item>
     <item name="android:datePickerStyle">@style/DatePickerTheme</item>
     <item name="android:datePickerDialogTheme">@style/DialogTheme</item>
     <item name="android:timePickerStyle">@style/TimePickerTheme</item>
@@ -29,10 +29,10 @@
   </style>
 
   <style name="DatePickerTheme" parent="android:style/Widget.Material.Light.DatePicker">
-    <item name="android:headerBackground">#ff3f83b1</item>
+    <item name="android:headerBackground">#ff0d1f1c</item>
   </style>
   <style name="TimePickerTheme" parent="android:style/Widget.Material.Light.TimePicker">
-    <item name="android:headerBackground">#ff3f83b1</item>
+    <item name="android:headerBackground">#ff0d1f1c</item>
   </style>
   <style name="LightEditTextTheme" parent="android:Theme.Material.Light.NoActionBar">
     <item name="android:colorControlActivated">#ffdadada</item>
@@ -41,14 +41,14 @@
     <item name="android:colorControlActivated">#ff9a9a9a</item>
   </style>
   <style name="DialogTheme" parent="@android:style/Theme.Material.Light.Dialog.Alert">
-    <item name="android:colorAccent">#ff039be5</item>
-    <item name="android:textColorLink">#ff039be5</item>
+    <item name="android:colorAccent">#ff008b87</item>
+    <item name="android:textColorLink">#ff008b87</item>
   </style>
   <style name="DialogThemeDark" parent="@android:style/Theme.Material.Dialog.Alert">
-    <item name="android:headerBackground">#ff222E3C</item>
-    <item name="android:colorAccent">#ff64cefd</item>
-    <item name="android:textColorLink">#ff61A9E1</item>
-    <item name="android:colorBackground">#ff1C2733</item>
+    <item name="android:headerBackground">#ff163a33</item>
+    <item name="android:colorAccent">#ff00c896</item>
+    <item name="android:textColorLink">#ff00c896</item>
+    <item name="android:colorBackground">#ff12302a</item>
   </style>
 
   <style name="WhiteRecyclerTheme" parent="@style/AppTheme">

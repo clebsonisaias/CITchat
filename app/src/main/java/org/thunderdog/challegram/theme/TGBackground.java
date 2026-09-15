@@ -246,10 +246,10 @@ public class TGBackground {
       case ThemeId.BLACK_WHITE:
       case ThemeId.NIGHT_BLACK:
       case ThemeId.NIGHT_BLUE:
+      case ThemeId.BLUE: // CITchat: plain brand chat background instead of the Telegram pattern
+      case ThemeId.CLASSIC:
         return 0; // Disabled by default
 
-      case ThemeId.BLUE:
-      case ThemeId.CLASSIC:
       case ThemeId.CYAN:
       case ThemeId.WHITE_BLACK:
         return ID_CATS_BLUE;

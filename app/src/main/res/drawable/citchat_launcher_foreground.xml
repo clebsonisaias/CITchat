@@ -8,9 +8,9 @@
 
   <!-- Bubble with the "C" cut out, so the background colour shows through -->
   <path
-    android:fillColor="#FFFFFFFF"
+    android:fillColor="#FF0D1F1C"
     android:pathData="M31,52a23,23 0,1 0,46 0a23,23 0,1 0,-46 0z M35.5,63.5L32,77L46.5,72z M64.253,62.253A14.5,14.5 0,1 1,64.253 41.747A3,3 0,0 1,60.01 45.99A8.5,8.5 0,1 0,60.01 58.01A3,3 0,0 1,64.253 62.253z" />
   <path
-    android:fillColor="#FFFF8A3D"
+    android:fillColor="#FFD8FF3E"
     android:pathData="M63.1,52a3.4,3.4 0,1 1,6.8 0a3.4,3.4 0,1 1,-6.8 0z" />
 </vector>

@@ -7,7 +7,12 @@
 # citchat-icon.svg e aos vetores em app/src/main/res/drawable (app_adaptive_fg_monochrome.xml,
 # citchat_launcher_foreground.xml). Se mudar a arte, mude nos tres lugares.
 param(
-  [string]$PreviewDir = ''
+  [string]$PreviewDir = '',
+  [switch]$PreviewOnly,
+  # Cores da marca CITmax (citmax.com.br): fundo --brand-primary, balao --ink, ponto --brand-accent
+  [string]$BackgroundColor = '#00C896',
+  [string]$GlyphColor = '#0D1F1C',
+  [string]$DotColor = '#D8FF3E'
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -15,9 +20,9 @@ Add-Type -AssemblyName System.Drawing
 $Repo = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $Res = Join-Path $Repo 'app\src\main\res'
 
-$Brand  = [System.Drawing.ColorTranslator]::FromHtml('#0E7C86')
-$Accent = [System.Drawing.ColorTranslator]::FromHtml('#FF8A3D')
-$White  = [System.Drawing.Color]::White
+$Brand  = [System.Drawing.ColorTranslator]::FromHtml($BackgroundColor)
+$Accent = [System.Drawing.ColorTranslator]::FromHtml($DotColor)
+$White  = [System.Drawing.ColorTranslator]::FromHtml($GlyphColor)
 
 # Bubble with the "C" (and optionally the dot) cut out. The tail is filled separately,
 # because with FillMode.Alternate its overlap with the bubble would become a hole.
@@ -96,7 +101,8 @@ function New-NotificationIcon([int]$Size, [string]$Matte = '') {
   $glyph = $Size * 20.0 / 24
   # glyph bounds on the canvas: x 31..77, y 29..77 -> centred square (30, 29, 48)
   Set-CanvasTransform $g (($Size - $glyph) / 2) (($Size - $glyph) / 2) $glyph 30 29 48
-  Draw-Glyph $g $White $true $null
+  # Android tints status bar icons: only the alpha channel matters, keep it white
+  Draw-Glyph $g ([System.Drawing.Color]::White) $true $null
   $g.Dispose()
   return $bmp
 }
@@ -118,6 +124,7 @@ function New-IntroTexture([double]$Density, [string]$Matte = '') {
 }
 
 $densities = [ordered]@{ 'mdpi' = 1.0; 'hdpi' = 1.5; 'xhdpi' = 2.0; 'xxhdpi' = 3.0; 'xxxhdpi' = 4.0 }
+if (-not $PreviewOnly) {
 foreach ($d in $densities.Keys) {
   $f = $densities[$d]
   Save-Png (New-LauncherIcon ([int](48 * $f)) 'circle') (Join-Path $Res "mipmap-$d\app_launcher.png")
@@ -129,9 +136,11 @@ foreach ($d in $densities.Keys) {
 }
 Save-Png (New-LauncherIcon 512 'full') (Join-Path $PSScriptRoot 'play-store-512.png')
 "Icones gerados em $Res"
+}
 
 if ($PreviewDir) {
   New-Item -ItemType Directory -Force -Path $PreviewDir | Out-Null
+  Save-Png (New-LauncherIcon 192 'circle' '#FDFCF5') (Join-Path $PreviewDir 'launcher-192.png')
   Save-Png (New-NotificationIcon 96 '#37474F') (Join-Path $PreviewDir 'notification-96.png')
   # Intro: sphere + texture composed like IntroRenderer does at xxhdpi
   $s = 3.0

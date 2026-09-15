@@ -16,6 +16,7 @@ As mudanças no código do Telegram X foram mantidas pequenas, para facilitar re
 |---|---|
 | Nome | `app.name=CITchat` no build. `core/Branding.java` troca "Telegram X" pelo nome do app em todos os textos, inclusive nas traduções baixadas de translations.telegram.org |
 | Ícones | Ícone novo (balão com "C") no launcher, no ícone adaptativo e monocromático, na notificação, na animação da introdução e nas telas de senha e de chamada. O logo do Telegram foi removido |
+| Cores | Paleta do site da CITmax nos temas claro (padrão) e escuro: cabeçalho em tinta `#0D1F1C`, destaques verdes `#00C896`/`#008B87`, contadores e botão flutuante em limão `#D8FF3E`, fundo creme. Aplicada por `citchat/branding/aplicar-paleta.ps1`. O fundo das conversas é liso, sem o padrão do Telegram |
 | Introdução | A primeira página avisa que o CITchat é um cliente não oficial que usa a API do Telegram (exigência dos termos da API) |
 | Atualizações | O atualizador só aceita APKs com o nome `CITchat-*`, então não oferece mais builds do Telegram X |
 | Manifest | As ações das notificações (encerrar chamada, responder, player, localização) usam `${applicationId}` e funcionam com o pacote novo |
@@ -71,9 +72,10 @@ notificações push** com o app fechado.
 - **Política de privacidade:** o link aponta para telegram.org/privacy. Publicar a política do CITchat.
 - **Mapas:** a chave do Google Maps no `AndroidManifest.xml` é do Telegram X e não funciona com o
   pacote novo. Criar uma chave própria.
-- **Cores:** o tema continua azul. A cor da marca (`#0E7C86`) está em `res/values/citchat_colors.xml`.
-- **Ícone oficial:** o ícone atual é provisório. Para trocar a arte, edite `citchat/branding/citchat-icon.svg`,
-  os vetores em `app/src/main/res/drawable/` e rode `citchat\branding\gerar-icones.ps1`.
+- **Fontes:** o site usa Inter (texto) e Bricolage Grotesque (títulos); o app ainda usa Roboto.
+- **Ícone:** usa as cores da CITmax, mas a arte (balão com "C") é própria do CITchat. Para trocar,
+  edite `citchat/branding/citchat-icon.svg`, os vetores em `app/src/main/res/drawable/` e rode
+  `citchat\branding\gerar-icones.ps1`.
 
 ## Termos da API do Telegram (resumo)
 
