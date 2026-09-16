@@ -60,6 +60,12 @@
 # MP4Parser
 -keep class * implements com.coremedia.iso.boxes.Box { *; }
 
+# CITchat: Vosk speech recognition, bound to the native library through JNA reflection
+-keep class org.vosk.** { *; }
+-keep class com.sun.jna.** { *; }
+-keep class * implements com.sun.jna.** { *; }
+-dontwarn java.awt.**
+
 # https://github.com/leolin310148/ShortcutBadger/blob/master/ShortcutBadger/proguard-rules.pro
 -keep class me.leolin.shortcutbadger.impl.** {
   <init>(...);

@@ -1081,6 +1081,14 @@ dependencies {
   // mp4parser: https://github.com/sannies/mp4parser/releases
   implementation(libs.mp4parser.isoparser)
 
+  // CITchat: on-device voice message transcription. Vosk (Apache 2.0): https://alphacephei.com/vosk/android
+  implementation(libs.vosk.android) {
+    artifact { type = "aar" }
+  }
+  implementation(libs.jna) {
+    artifact { type = "aar" }
+  }
+
   // Compiler warnings
   compileOnly(libs.annotations.errorprone)
   compileOnly(libs.annotations.j2objc)

@@ -2,4 +2,16 @@
 <!-- CITchat-only strings. Keys must not exist on translations.telegram.org (android_x), otherwise the server value wins. -->
 <resources>
   <string name="CITchatUnofficialClient">%1$s is an unofficial Telegram client that uses the Telegram API. It is not affiliated with Telegram.</string>
+  <string name="CITchatClose">Close</string>
+
+  <!-- On-device transcription of voice and video messages (Vosk) -->
+  <string name="CITchatTranscribe">Transcribe audio</string>
+  <string name="CITchatTranscribing">Transcribing on your device…</string>
+  <string name="CITchatTranscribeDone">Transcription ready. Tap Transcribe audio again to see it.</string>
+  <string name="CITchatTranscribeBusy">Another audio is being transcribed. Try again in a moment.</string>
+  <string name="CITchatTranscribeFailed">Couldn\'t transcribe this audio</string>
+  <string name="CITchatTranscribeEmpty">No speech was recognized in this audio.</string>
+  <string name="CITchatTranscribeModelPrompt">To transcribe audio on your device, %1$s needs to download the Portuguese voice package once (%2$s). Your audio never leaves the phone.</string>
+  <string name="CITchatTranscribeModelDownload">Download and transcribe</string>
+  <string name="CITchatTranscribeModelDownloading">Downloading the voice package. The transcription starts right after.</string>
 </resources>

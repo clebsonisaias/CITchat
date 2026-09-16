@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="CITchatUnofficialClient">%1$s es un cliente no oficial de Telegram que usa la API de Telegram. No está afiliado a Telegram.</string>
+  <string name="CITchatClose">Cerrar</string>
+
+  <string name="CITchatTranscribe">Transcribir audio</string>
+  <string name="CITchatTranscribing">Transcribiendo en el dispositivo…</string>
+  <string name="CITchatTranscribeDone">Transcripción lista. Toca de nuevo Transcribir audio para verla.</string>
+  <string name="CITchatTranscribeBusy">Ya se está transcribiendo otro audio. Inténtalo de nuevo en un momento.</string>
+  <string name="CITchatTranscribeFailed">No se pudo transcribir este audio</string>
+  <string name="CITchatTranscribeEmpty">No se reconoció ninguna voz en este audio.</string>
+  <string name="CITchatTranscribeModelPrompt">Para transcribir audios en el dispositivo, %1$s necesita descargar una sola vez el paquete de voz en portugués (%2$s). Tus audios nunca salen del teléfono.</string>
+  <string name="CITchatTranscribeModelDownload">Descargar y transcribir</string>
+  <string name="CITchatTranscribeModelDownloading">Descargando el paquete de voz. La transcripción empieza enseguida.</string>
 </resources>

@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.drinkless.tdlib.TdApi;
 import org.thunderdog.challegram.R;
+import org.thunderdog.challegram.citchat.VoiceTranscription;
 import org.thunderdog.challegram.config.Config;
 import org.thunderdog.challegram.core.Lang;
 import org.thunderdog.challegram.data.ContentPreview;
@@ -902,6 +903,12 @@ public class MessageView extends SparseDrawableView implements Destroyable, Draw
       ids.append(R.id.btn_chatTranslate);
       strings.append(R.string.Translate);
       icons.append(R.drawable.baseline_translate_24);
+    }
+
+    if (!isMore && messageCount == 1 && VoiceTranscription.canTranscribe(msg.getMessage())) {
+      ids.append(R.id.btn_citchatTranscribe);
+      strings.append(R.string.CITchatTranscribe);
+      icons.append(R.drawable.baseline_mic_24);
     }
 
     if (messageCount == 1) {

@@ -81,6 +81,7 @@ import org.thunderdog.challegram.BuildConfig;
 import org.thunderdog.challegram.Log;
 import org.thunderdog.challegram.MainActivity;
 import org.thunderdog.challegram.R;
+import org.thunderdog.challegram.citchat.VoiceTranscription;
 import org.thunderdog.challegram.U;
 import org.thunderdog.challegram.component.MediaCollectorDelegate;
 import org.thunderdog.challegram.component.attach.CustomItemAnimator;
@@ -5813,6 +5814,9 @@ public class MessagesController extends ViewController<MessagesController.Argume
           }
           tdlib.ui().saveGifs(((List<TD.DownloadedFile>) selectedMessageTag));
         }
+        return true;
+      } else if (id == R.id.btn_citchatTranscribe) {
+        VoiceTranscription.transcribe(this, selectedMessage.getMessage());
         return true;
       } else if (id == R.id.btn_saveFile) {
         if (selectedMessageTag != null) {
