@@ -28,8 +28,11 @@ import java.util.Calendar;
 public final class HouseAd {
   public static final String URL = "https://citmax.com.br/citmovel";
 
-  private static final String KEY_SHOWN_DAY = "citchat_house_ad_shown_day";
-  private static final String KEY_HIDDEN_DAY = "citchat_house_ad_hidden_day";
+  /** Change it whenever the ad content changes: a new campaign is shown even where the old one was already shown or hidden today. */
+  private static final String CAMPAIGN = "citmovel-25gb-202609";
+
+  private static final String KEY_SHOWN_DAY = "citchat_house_ad_shown_day_" + CAMPAIGN;
+  private static final String KEY_HIDDEN_DAY = "citchat_house_ad_hidden_day_" + CAMPAIGN;
 
   private static boolean loaded;
   private static long shownDay, hiddenDay;

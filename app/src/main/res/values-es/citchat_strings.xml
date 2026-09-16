@@ -14,6 +14,6 @@
   <string name="CITchatTranscribeModelDownloading">Descargando el paquete de voz. La transcripción empieza enseguida.</string>
 
   <string name="CITchatAdSponsored">Patrocinado</string>
-  <string name="CITchatAdText">25 GB por R$ 39,90/mes, con llamadas y SMS</string>
+  <string name="CITchatAdText">Chip con 25 GB por R$ 39,90/mes</string>
   <string name="CITchatAdHide">Ocultar anuncio</string>
 </resources>

@@ -14,6 +14,7 @@ package org.thunderdog.challegram.citchat;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
@@ -32,6 +33,7 @@ import org.thunderdog.challegram.support.RippleSupport;
 import org.thunderdog.challegram.theme.ColorId;
 import org.thunderdog.challegram.theme.Theme;
 import org.thunderdog.challegram.tool.Drawables;
+import org.thunderdog.challegram.tool.Fonts;
 import org.thunderdog.challegram.tool.Paints;
 import org.thunderdog.challegram.tool.Screen;
 import org.thunderdog.challegram.unsorted.Settings;
@@ -51,6 +53,10 @@ public class HouseAdView extends View {
   private final Drawable icon, closeIcon;
   private final int brandColor;
   private final RectF badgeRect = new RectF();
+  // Own paints: Paints.getMediumTextPaint returns one shared instance, so the badge would restyle the title.
+  private final TextPaint titlePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+  private final TextPaint badgePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+  private final TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 
   private @Nullable Delegate delegate;
   private boolean touchOnClose;
@@ -60,6 +66,9 @@ public class HouseAdView extends View {
     icon = Drawables.get(getResources(), R.drawable.baseline_sim_card_24);
     closeIcon = Drawables.get(getResources(), R.drawable.baseline_close_24);
     brandColor = ContextCompat.getColor(context, R.color.citchat_brand_deep);
+    titlePaint.setTypeface(Fonts.getRobotoMedium());
+    badgePaint.setTypeface(Fonts.getRobotoMedium());
+    textPaint.setTypeface(Fonts.getRobotoRegular());
     RippleSupport.setSimpleWhiteBackground(this, themeProvider);
     setOnClickListener(v -> {
       if (delegate == null) {
@@ -112,9 +121,12 @@ public class HouseAdView extends View {
     final int textStart = ChatView.getLeftPadding(mode);
     final int textWidth = Math.max(0, width - textStart - closeArea);
 
-    final TextPaint titlePaint = Paints.getMediumTextPaint(17f, Theme.getColor(ColorId.text), false);
-    final TextPaint badgePaint = Paints.getMediumTextPaint(12f, Theme.getColor(ColorId.badgeMutedText), false);
-    final TextPaint textPaint = Paints.getRegularTextPaint(15f, Theme.getColor(ColorId.textLight));
+    titlePaint.setTextSize(Screen.dp(17f));
+    titlePaint.setColor(Theme.getColor(ColorId.text));
+    badgePaint.setTextSize(Screen.dp(12f));
+    badgePaint.setColor(Theme.getColor(ColorId.badgeMutedText));
+    textPaint.setTextSize(Screen.dp(15f));
+    textPaint.setColor(Theme.getColor(ColorId.textLight));
 
     final String badge = Lang.getString(R.string.CITchatAdSponsored);
     final float badgePadding = Screen.dp(6f);

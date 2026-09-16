@@ -18,6 +18,6 @@
   <!-- House ad in the chat list. Prices come from citmax.com.br/citmovel: update them when the plan changes. -->
   <string name="CITchatAdTitle" translatable="false">CITmóvel</string>
   <string name="CITchatAdSponsored">Sponsored</string>
-  <string name="CITchatAdText">25 GB for R$ 39.90/month, with calls and texts</string>
+  <string name="CITchatAdText">SIM with 25 GB for R$ 39.90/month</string>
   <string name="CITchatAdHide">Hide ad</string>
 </resources>
