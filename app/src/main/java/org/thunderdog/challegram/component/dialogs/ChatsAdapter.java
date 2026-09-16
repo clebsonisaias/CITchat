@@ -27,6 +27,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.drinkless.tdlib.TdApi;
 import org.thunderdog.challegram.R;
+import org.thunderdog.challegram.citchat.HouseAd;
+import org.thunderdog.challegram.citchat.HouseAdView;
 import org.thunderdog.challegram.core.Lang;
 import org.thunderdog.challegram.data.TGChat;
 import org.thunderdog.challegram.telegram.Tdlib;
@@ -66,6 +68,9 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
     for (TGChat chat : chats) {
       chat.checkChatListMode();
     }
+    if (hasHouseAd) {
+      notifyItemChanged(getHouseAdItemPosition());
+    }
   }
 
   public ArrayList<TGChat> getChats () {
@@ -101,6 +106,38 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
 
   public long[] getSuggestedChatIds () {
     return suggestedChatIds;
+  }
+
+  private boolean hasHouseAd;
+
+  public void setHasHouseAd (boolean hasHouseAd) {
+    if (this.hasHouseAd != hasHouseAd) {
+      this.hasHouseAd = hasHouseAd;
+      int position = getHouseAdItemPosition(true);
+      if (hasHouseAd) {
+        notifyItemInserted(position);
+      } else {
+        notifyItemRemoved(position);
+      }
+      invalidateAttachedItemDecorations();
+    }
+  }
+
+  public boolean hasHouseAd () {
+    return hasHouseAd;
+  }
+
+  public int getHouseAdItemPosition () {
+    return getHouseAdItemPosition(hasHouseAd);
+  }
+
+  private int getHouseAdItemPosition (boolean hasHouseAd) {
+    return hasHouseAd ? (hasSuggestedChats() ? 1 : 0) : -1;
+  }
+
+  /** Items above the first chat: suggested chats, then the house ad. */
+  private int getHeaderItemCount () {
+    return (hasSuggestedChats() ? 1 : 0) + (hasHouseAd ? 1 : 0);
   }
 
   private boolean needArchive, hasArchive;
@@ -208,6 +245,13 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
         holder.setChatIds(suggestedChatIds);
         break;
       }
+      case VIEW_TYPE_HOUSE_AD: {
+        ((HouseAdView) holder.itemView).updateContentDescription();
+        holder.itemView.requestLayout();
+        holder.itemView.invalidate();
+        HouseAd.markShown();
+        break;
+      }
     }
   }
 
@@ -249,10 +293,7 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
 
   @Override
   public int getItemCount () {
-    int itemCount = 0;
-    if (hasSuggestedChats()) {
-      itemCount++;
-    }
+    int itemCount = getHeaderItemCount();
     if (hasChats()) {
       itemCount += chats.size() + 1;
     }
@@ -271,7 +312,7 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
     return suggestedChatIds.length > 0;
   }
 
-  @IntDef({VIEW_TYPE_CHAT, VIEW_TYPE_INFO, VIEW_TYPE_EMPTY, VIEW_TYPE_SUGGESTED_CHATS})
+  @IntDef({VIEW_TYPE_CHAT, VIEW_TYPE_INFO, VIEW_TYPE_EMPTY, VIEW_TYPE_SUGGESTED_CHATS, VIEW_TYPE_HOUSE_AD})
   public @interface ViewType {
   }
 
@@ -279,11 +320,15 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
   public static final int VIEW_TYPE_INFO = 1;
   public static final int VIEW_TYPE_EMPTY = 2;
   public static final int VIEW_TYPE_SUGGESTED_CHATS = 3;
+  public static final int VIEW_TYPE_HOUSE_AD = 4;
 
   @Override
   public int getItemViewType (int position) {
     if (hasSuggestedChats() && position == 0) {
       return VIEW_TYPE_SUGGESTED_CHATS;
+    }
+    if (hasHouseAd && position == getHouseAdItemPosition()) {
+      return VIEW_TYPE_HOUSE_AD;
     }
     if (hasChats()) {
       int chatIndex = getChatIndexByItemPosition(position);
@@ -328,14 +373,14 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsViewHolder> {
     if (chatIndex == -1) {
       return -1;
     }
-    return hasSuggestedChats() ? chatIndex + 1 : chatIndex;
+    return chatIndex + getHeaderItemCount();
   }
 
   public int getChatIndexByItemPosition (int itemPosition) {
     if (itemPosition == RecyclerView.NO_POSITION) {
       return -1;
     }
-    return hasSuggestedChats() ? itemPosition - 1 : itemPosition;
+    return itemPosition - getHeaderItemCount();
   }
 
   public int findChatItemPosition (long chatId) {

@@ -44,6 +44,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
 import org.thunderdog.challegram.R;
+import org.thunderdog.challegram.citchat.HouseAd;
+import org.thunderdog.challegram.citchat.HouseAdView;
 import org.thunderdog.challegram.component.attach.CustomItemAnimator;
 import org.thunderdog.challegram.component.chat.MessagesManager;
 import org.thunderdog.challegram.component.dialogs.ChatView;
@@ -147,7 +149,8 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
   ForceTouchView.PreviewDelegate, LiveLocationHelper.Callback,
   BaseView.LongPressInterceptor, TdlibCache.UserStatusChangeListener,
   Settings.ChatListModeChangeListener, CounterChangeListener,
-  TdlibSettingsManager.PreferenceChangeListener, SelectDelegate, MoreDelegate, DateChangeListener, ChatFolderListener {
+  TdlibSettingsManager.PreferenceChangeListener, SelectDelegate, MoreDelegate, DateChangeListener, ChatFolderListener,
+  HouseAdView.Delegate {
 
   private static final int NO_CHAT_FOLDER_ID = 0;
 
@@ -310,30 +313,7 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
                 final int top = view.getBottom() + offsetTop;
                 View nextView = parent.getLayoutManager().findViewByPosition(adapterPosition + 1);
                 final int bottom = (nextView != null ? nextView.getTop() : parent.getLayoutManager().getDecoratedBottom(view)) + offsetTop;
-
-                c.drawRect(0, top, right, bottom, Paints.fillingPaint(Theme.backgroundColor()));
-
-                if (shadowFactor != 0f) {
-                  final int alpha = (int) (255f * maxAlpha * shadowFactor);
-
-                  topShadowPaint.setAlpha(alpha);
-                  bottomShadowPaint.setAlpha(alpha);
-
-                  c.save();
-                  int shadowTopTop = bottom - ShadowView.simpleTopShadowHeight();
-                  c.translate(0, shadowTopTop);
-                  c.drawRect(0, 0, right, ShadowView.simpleTopShadowHeight(), topShadowPaint);
-                  c.translate(0, top - shadowTopTop);
-                  c.drawRect(0, 0, right, ShadowView.simpleBottomShadowHeight(), bottomShadowPaint);
-                  c.restore();
-                }
-
-                if (lineFactor != 0f) {
-                  final int color = ColorUtils.alphaColor(lineFactor, Theme.separatorColor());
-                  c.drawRect(0, top, right, top + separatorHeight, Paints.fillingPaint(color));
-                  c.drawRect(0, bottom - separatorHeight, right, bottom, Paints.fillingPaint(color));
-                }
-
+                drawSectionGap(c, top, bottom, right, maxAlpha, shadowFactor, lineFactor, separatorHeight);
                 needSeparator = false;
               }
             }
@@ -344,6 +324,19 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
               c.drawRect(0, separatorTop, right - separatorLeft, separatorTop + separatorHeight, Paints.fillingPaint(separatorColor));
             } else {
               c.drawRect(separatorLeft, separatorTop, right, separatorTop + separatorHeight, Paints.fillingPaint(separatorColor));
+            }
+          }
+        } else if (viewType == ChatsAdapter.VIEW_TYPE_HOUSE_AD) {
+          // The ad is its own section, split from the chats below like pinned chats are from the rest.
+          offsetTop = (int) view.getTranslationY();
+          right = view.getWidth();
+          int adapterPosition = parent.getChildAdapterPosition(view);
+          View nextView = adapterPosition != RecyclerView.NO_POSITION ? parent.getLayoutManager().findViewByPosition(adapterPosition + 1) : null;
+          if (nextView != null) {
+            final int top = view.getBottom() + offsetTop;
+            final int bottom = nextView.getTop() + offsetTop;
+            if (bottom > top) {
+              drawSectionGap(c, top, bottom, right, maxAlpha, shadowFactor, lineFactor, separatorHeight);
             }
           }
         } else if (viewType == ChatsAdapter.VIEW_TYPE_SUGGESTED_CHATS) {
@@ -401,11 +394,48 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
       }
     }
 
+    private void drawSectionGap (Canvas c, int top, int bottom, int right, float maxAlpha, float shadowFactor, float lineFactor, int separatorHeight) {
+      c.drawRect(0, top, right, bottom, Paints.fillingPaint(Theme.backgroundColor()));
+
+      if (shadowFactor != 0f) {
+        final int alpha = (int) (255f * maxAlpha * shadowFactor);
+
+        topShadowPaint.setAlpha(alpha);
+        bottomShadowPaint.setAlpha(alpha);
+
+        c.save();
+        int shadowTopTop = bottom - ShadowView.simpleTopShadowHeight();
+        c.translate(0, shadowTopTop);
+        c.drawRect(0, 0, right, ShadowView.simpleTopShadowHeight(), topShadowPaint);
+        c.translate(0, top - shadowTopTop);
+        c.drawRect(0, 0, right, ShadowView.simpleBottomShadowHeight(), bottomShadowPaint);
+        c.restore();
+      }
+
+      if (lineFactor != 0f) {
+        final int color = ColorUtils.alphaColor(lineFactor, Theme.separatorColor());
+        c.drawRect(0, top, right, top + separatorHeight, Paints.fillingPaint(color));
+        c.drawRect(0, bottom - separatorHeight, right, bottom, Paints.fillingPaint(color));
+      }
+    }
+
     @Override
     public void getItemOffsets (@NonNull Rect outRect, @NonNull View view, RecyclerView parent, @NonNull RecyclerView.State state) {
       int position = parent.getChildAdapterPosition(view);
       if (position == RecyclerView.NO_POSITION) {
         outRect.bottom = outRect.top = 0;
+        return;
+      }
+
+      if (parent.getChildViewHolder(view).getItemViewType() == ChatsAdapter.VIEW_TYPE_HOUSE_AD) {
+        outRect.top = 0;
+        if (position + 1 >= context.adapter.getItemCount()) {
+          outRect.bottom = 0;
+        } else if (context.liveLocationHelper != null && context.liveLocationHelper.isVisible() && position == context.getLiveLocationPosition() - 1) {
+          outRect.bottom = Screen.dp(1f);
+        } else {
+          outRect.bottom = Screen.dp(12f);
+        }
         return;
       }
 
@@ -842,6 +872,7 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
       if (chatsView == null) {
         return;
       }
+      checkHouseAd();
       adapter.notifyLastItemChanged();
       if (hide) {
         onHideArchiveRequested();
@@ -849,6 +880,44 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
         // if it is not visible, just invalidate decoration
       }
     }
+  }
+
+  // CITchat: CITmóvel ad at the top of the main chat list. HouseAd says what it may and may not do.
+
+  private boolean needHouseAd () {
+    // With "hide archive" on, the collapsed archive must be the first item: the collapse logic works with positions 0 and 1.
+    // Without chats the "no chats" screen covers the list, so there is nothing to place the ad above.
+    return isBaseController() && filter == null && TD.isChatListMain(chatList()) && !isInForceTouchMode() && !hideArchive &&
+      adapter.hasChats() && HouseAd.shouldShow();
+  }
+
+  private void checkHouseAd () {
+    if (adapter == null || chatsView == null) {
+      return;
+    }
+    boolean show = needHouseAd();
+    if (show != adapter.hasHouseAd()) {
+      LinearLayoutManager manager = (LinearLayoutManager) chatsView.getLayoutManager();
+      boolean atTop = adapter.getItemCount() == 0 || (manager != null && manager.findFirstCompletelyVisibleItemPosition() == 0);
+      adapter.setHasHouseAd(show);
+      if (show && atTop) {
+        // An item inserted above the first visible one would stay out of sight.
+        chatsView.scrollToPosition(0);
+      }
+    }
+  }
+
+  @Override
+  public void onHouseAdClick () {
+    if (!inSelectMode()) {
+      UI.openUrl(HouseAd.URL);
+    }
+  }
+
+  @Override
+  public void onHouseAdHide () {
+    HouseAd.hideForToday();
+    checkHouseAd();
   }
 
   private void onHideArchiveRequested () {
@@ -1068,6 +1137,10 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
         totalScrollBy += ChatsViewHolder.measureHeightForType(ChatsAdapter.VIEW_TYPE_SUGGESTED_CHATS);
       }
 
+      if (adapter.hasHouseAd() && firstVisiblePosition > adapter.getHouseAdItemPosition()) {
+        totalScrollBy += Screen.dp(12f);
+      }
+
       View firstView = manager.findViewByPosition(firstVisiblePosition);
       if (firstView != null) {
         totalScrollBy -= manager.getDecoratedTop(firstView); // firstView.getTop();
@@ -1111,6 +1184,10 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
 
     if (adapter.hasSuggestedChats()) {
       totalScrollBy += ChatsViewHolder.measureHeightForType(ChatsAdapter.VIEW_TYPE_SUGGESTED_CHATS);
+    }
+
+    if (adapter.hasHouseAd()) {
+      totalScrollBy += ChatsViewHolder.measureHeightForType(ChatsAdapter.VIEW_TYPE_HOUSE_AD) + Screen.dp(12f);
     }
 
     return totalScrollBy;
@@ -2385,6 +2462,7 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
   public void checkListState () {
     checkDisplayProgress();
     checkDisplayNoChats();
+    checkHouseAd();
   }
 
   private static final int ANIMATOR_PLACEHOLDER = 0;
@@ -2950,6 +3028,7 @@ public class ChatsController extends TelegramViewController<ChatsController.Argu
   public void onDateChanged () {
     if (!isDestroyed() && chatsView != null) {
       chatsView.updateRelativeDate();
+      checkHouseAd();
     }
   }
 

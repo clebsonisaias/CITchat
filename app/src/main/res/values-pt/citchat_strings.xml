@@ -12,4 +12,8 @@
   <string name="CITchatTranscribeModelPrompt">Para transcrever áudios no aparelho, o %1$s precisa baixar uma única vez o pacote de voz em português (%2$s). Seus áudios nunca saem do celular.</string>
   <string name="CITchatTranscribeModelDownload">Baixar e transcrever</string>
   <string name="CITchatTranscribeModelDownloading">Baixando o pacote de voz. A transcrição começa logo em seguida.</string>
+
+  <string name="CITchatAdSponsored">Patrocinado</string>
+  <string name="CITchatAdText">25 GB por R$ 39,90/mês, com ligações e SMS</string>
+  <string name="CITchatAdHide">Ocultar anúncio</string>
 </resources>

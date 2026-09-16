@@ -27,6 +27,7 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.thunderdog.challegram.R;
+import org.thunderdog.challegram.citchat.HouseAdView;
 import org.thunderdog.challegram.component.dialogs.ChatsAdapter.ViewType;
 import org.thunderdog.challegram.core.Lang;
 import org.thunderdog.challegram.data.TGChat;
@@ -58,6 +59,8 @@ public class ChatsViewHolder extends RecyclerView.ViewHolder {
         return SettingHolder.measureHeightForType(ListItem.TYPE_LIST_INFO_VIEW);
       case ChatsAdapter.VIEW_TYPE_SUGGESTED_CHATS:
         return Screen.dp(SuggestedChatsView.DEFAULT_HEIGHT_DP);
+      case ChatsAdapter.VIEW_TYPE_HOUSE_AD:
+        return ChatView.getViewHeight(Settings.instance().getChatListMode());
       default:
         throw new IllegalArgumentException("viewType = " + viewType);
     }
@@ -136,6 +139,12 @@ public class ChatsViewHolder extends RecyclerView.ViewHolder {
         if (themeProvider != null) {
           themeProvider.addThemeInvalidateListener(view);
         }
+        return new ChatsViewHolder(view);
+      }
+      case ChatsAdapter.VIEW_TYPE_HOUSE_AD: {
+        HouseAdView view = new HouseAdView(context, themeProvider);
+        view.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        view.setDelegate(parentController);
         return new ChatsViewHolder(view);
       }
       default: {

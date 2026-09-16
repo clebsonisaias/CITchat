@@ -12,4 +12,8 @@
   <string name="CITchatTranscribeModelPrompt">Para transcribir audios en el dispositivo, %1$s necesita descargar una sola vez el paquete de voz en portugués (%2$s). Tus audios nunca salen del teléfono.</string>
   <string name="CITchatTranscribeModelDownload">Descargar y transcribir</string>
   <string name="CITchatTranscribeModelDownloading">Descargando el paquete de voz. La transcripción empieza enseguida.</string>
+
+  <string name="CITchatAdSponsored">Patrocinado</string>
+  <string name="CITchatAdText">25 GB por R$ 39,90/mes, con llamadas y SMS</string>
+  <string name="CITchatAdHide">Ocultar anuncio</string>
 </resources>

@@ -14,4 +14,10 @@
   <string name="CITchatTranscribeModelPrompt">To transcribe audio on your device, %1$s needs to download the Portuguese voice package once (%2$s). Your audio never leaves the phone.</string>
   <string name="CITchatTranscribeModelDownload">Download and transcribe</string>
   <string name="CITchatTranscribeModelDownloading">Downloading the voice package. The transcription starts right after.</string>
+
+  <!-- House ad in the chat list. Prices come from citmax.com.br/citmovel: update them when the plan changes. -->
+  <string name="CITchatAdTitle" translatable="false">CITmóvel</string>
+  <string name="CITchatAdSponsored">Sponsored</string>
+  <string name="CITchatAdText">25 GB for R$ 39.90/month, with calls and texts</string>
+  <string name="CITchatAdHide">Hide ad</string>
 </resources>
