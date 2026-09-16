@@ -23,6 +23,8 @@ As mudanças no código do Telegram X foram mantidas pequenas, para facilitar re
 | Atualizações | O atualizador só aceita APKs com o nome `CITchat-*`, então não oferece mais builds do Telegram X |
 | Manifest | As ações das notificações (encerrar chamada, responder, player, localização) usam `${applicationId}` e funcionam com o pacote novo |
 | Contas do Android | A conta de sincronização aparece como "CITchat" |
+| Transcrição de áudio | Opção "Transcrever áudio" nas mensagens de voz e de vídeo (Android 10 ou mais novo). Roda no aparelho com o [Vosk](https://alphacephei.com/vosk); o pacote de voz em português (31 MB) é baixado no primeiro uso, e o áudio não sai do celular |
+| Anúncio da CITmóvel | Linha "Patrocinado" no topo da lista de conversas, que abre citmax.com.br/citmovel (pacote `org.thunderdog.challegram.citchat`, classe `HouseAd`). Aparece em no máximo uma sessão por dia, e o X esconde até o dia seguinte. Não usa rede de anúncios, não faz requisição e não lê as conversas. Fica de fora das pastas, do arquivo e do modo "ocultar arquivo" |
 
 ## Compilar (GitHub Actions)
 
@@ -75,6 +77,9 @@ notificações push** com o app fechado.
 - **Mapas:** a chave do Google Maps no `AndroidManifest.xml` é do Telegram X e não funciona com o
   pacote novo. Criar uma chave própria.
 - **Fontes:** o Manual da marca usa Righteous (fonte da marca) e Montserrat (apoio); o app ainda usa Roboto.
+- **Anúncio da CITmóvel:** o texto e o preço (`CITchatAdText` em `app/src/main/res/values*/citchat_strings.xml`)
+  foram tirados do site em 16/09/2026. Atualize quando o plano mudar. Ao publicar, marque "contém anúncios"
+  no Play Console e cite o anúncio na descrição da loja, como pedem os termos da API (seção 3.2).
 - **Logo:** para trocar, substitua `citchat/branding/logo-citchat.svg` e rode
   `powershell -ExecutionPolicy Bypass -File citchat\branding\gerar-icones.ps1 -FromSvg citchat\branding\logo-citchat.svg`
   (o SVG é renderizado pelo Microsoft Edge e todos os ícones são gerados de novo).
