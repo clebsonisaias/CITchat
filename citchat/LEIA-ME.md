@@ -24,6 +24,10 @@ As mudanças no código do Telegram X foram mantidas pequenas, para facilitar re
 | Manifest | As ações das notificações (encerrar chamada, responder, player, localização) usam `${applicationId}` e funcionam com o pacote novo |
 | Contas do Android | A conta de sincronização aparece como "CITchat" |
 | Transcrição de áudio | Opção "Transcrever áudio" nas mensagens de voz e de vídeo (Android 10 ou mais novo). Roda no aparelho com o [Vosk](https://alphacephei.com/vosk); o pacote de voz em português (31 MB) é baixado no primeiro uso, e o áudio não sai do celular |
+| Pix e boleto | Mensagens com código Pix copia e cola ou boleto válido (CRC16 do Pix, dígitos verificadores do boleto) ganham o botão "Copiar Pix"/"Copiar boleto" e a opção no menu da mensagem. "Cobrar com Pix" e, em grupos, "Racha conta" (menu ⋮ da conversa) geram um Pix estático com a chave do próprio usuário e enviam o QR e o código. Nenhum dinheiro passa pelo app; chave, nome e cidade ficam no celular (`PixCode`, `PixCharge`) |
+| Alerta de golpe | Tudo no celular (`ScamGuard`): aviso acima das mensagens quando alguém fora dos contatos pede dinheiro, diz que mudou de número ou pede código de verificação; aviso antes de abrir link que imita banco ou site do governo, esconde o endereço, usa letras parecidas, número IP ou encurtador |
+| Figurinha de foto | "Criar figurinha" nas fotos e "Figurinha de uma foto" no menu ⋮ da conversa: recorte automático com o ML Kit (Google Play services, só na variante `latest`), contorno branco e prévia antes de enviar |
+| Economia de internet | No topo de Dados e armazenamento: modos prontos (normal, vídeo só no Wi-Fi, economia máxima), dados móveis usados no ciclo e franquia do plano com aviso em 80%, 90% e 100%. O uso do celular inteiro depende do "acesso ao uso" do Android, que o usuário concede (`DataSaving`) |
 | Anúncio da CITmóvel | Linha "Patrocinado" no topo da lista de conversas, que abre citmax.com.br/citmovel (pacote `org.thunderdog.challegram.citchat`, classe `HouseAd`). Aparece em no máximo uma sessão por dia, e o X esconde até o dia seguinte. Não usa rede de anúncios, não faz requisição e não lê as conversas. Fica de fora das pastas, do arquivo e do modo "ocultar arquivo" |
 
 ## Compilar (GitHub Actions)
@@ -80,6 +84,11 @@ notificações push** com o app fechado.
 - **Anúncio da CITmóvel:** o texto e o preço (`CITchatAdText` em `app/src/main/res/values*/citchat_strings.xml`)
   foram tirados do site em 16/09/2026. Atualize quando o plano mudar. Ao publicar, marque "contém anúncios"
   no Play Console e cite o anúncio na descrição da loja, como pedem os termos da API (seção 3.2).
+- **Acesso ao uso:** a permissão `PACKAGE_USAGE_STATS` é opcional e concedida pelo próprio usuário nas
+  configurações do Android. No formulário de segurança de dados da Play Store, explique que o app só lê o
+  total de dados móveis, no aparelho, para comparar com a franquia.
+- **Figurinhas:** o recorte usa o ML Kit do Google, que precisa do Google Play services e baixa o modelo no
+  primeiro uso. Em celulares sem os serviços do Google a opção não aparece.
 - **Logo:** para trocar, substitua `citchat/branding/logo-citchat.svg` e rode
   `powershell -ExecutionPolicy Bypass -File citchat\branding\gerar-icones.ps1 -FromSvg citchat\branding\logo-citchat.svg`
   (o SVG é renderizado pelo Microsoft Edge e todos os ícones são gerados de novo).
