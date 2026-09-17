@@ -81,6 +81,12 @@ import org.thunderdog.challegram.BuildConfig;
 import org.thunderdog.challegram.Log;
 import org.thunderdog.challegram.MainActivity;
 import org.thunderdog.challegram.R;
+import org.thunderdog.challegram.citchat.PixCharge;
+import org.thunderdog.challegram.citchat.PixCode;
+import org.thunderdog.challegram.citchat.PixMessages;
+import org.thunderdog.challegram.citchat.ScamGuard;
+import org.thunderdog.challegram.citchat.ScamWarnings;
+import org.thunderdog.challegram.citchat.StickerFromPhoto;
 import org.thunderdog.challegram.citchat.VoiceTranscription;
 import org.thunderdog.challegram.U;
 import org.thunderdog.challegram.component.MediaCollectorDelegate;
@@ -230,6 +236,7 @@ import org.thunderdog.challegram.util.StringList;
 import org.thunderdog.challegram.util.Unlockable;
 import org.thunderdog.challegram.util.text.Text;
 import org.thunderdog.challegram.util.text.TextColorSets;
+import org.thunderdog.challegram.util.text.TextEntity;
 import org.thunderdog.challegram.v.HeaderEditText;
 import org.thunderdog.challegram.v.MessagesLayoutManager;
 import org.thunderdog.challegram.v.MessagesRecyclerView;
@@ -891,6 +898,42 @@ public class MessagesController extends ViewController<MessagesController.Argume
     toastAlertView.setPadding(Screen.dp(16f), Screen.dp(8f), Screen.dp(16f), Screen.dp(8f));
     toastAlertView.setHeightChangeListener((v, newHeight) -> topBar.notifyItemHeightChanged(toastAlertItem));
 
+    // CITchat: scam warning, same text view as the toast plus a close button
+    scamWarningText = new CustomTextView(context, tdlib);
+    scamWarningText.setTextSize(15f);
+    addThemeTextAccentColorListener(scamWarningText);
+    scamWarningText.setTextColorId(ColorId.text);
+    scamWarningText.setPadding(Screen.dp(16f), Screen.dp(10f), Screen.dp(52f), Screen.dp(10f));
+    scamWarningText.setHeightChangeListener((v, newHeight) -> topBar.notifyItemHeightChanged(scamWarningItem));
+    ImageView scamWarningClose = new ImageView(context);
+    scamWarningClose.setScaleType(ImageView.ScaleType.CENTER);
+    scamWarningClose.setImageResource(R.drawable.baseline_close_18);
+    scamWarningClose.setColorFilter(Theme.iconColor());
+    addThemeFilterListener(scamWarningClose, ColorId.icon);
+    scamWarningClose.setOnClickListener(v -> dismissScamWarning());
+    Views.setClickable(scamWarningClose);
+    RippleSupport.setTransparentSelector(scamWarningClose);
+    scamWarningView = new FrameLayoutFix(context);
+    ViewSupport.setThemedBackground(scamWarningView, ColorId.filling, this);
+    scamWarningView.addView(scamWarningText, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    scamWarningView.addView(scamWarningClose, new FrameLayout.LayoutParams(Screen.dp(48f), Screen.dp(48f), Gravity.RIGHT | Gravity.TOP));
+    scamWarningItem = new CollapseListView.Item() {
+      @Override
+      public int getVisualHeight () {
+        return scamWarningText.getCurrentHeight(scamWarningText.getMeasuredWidth());
+      }
+
+      @Override
+      public boolean allowCollapse () {
+        return false;
+      }
+
+      @Override
+      public View getValue () {
+        return scamWarningView;
+      }
+    };
+
     pinnedMessagesBar = new PinnedMessagesBar(context, true) {
       @Override
       protected void onViewportChanged () {
@@ -937,6 +980,7 @@ public class MessagesController extends ViewController<MessagesController.Argume
 
     topBar.initWithList(new CollapseListView.Item[] {
       // TODO voice chat bar
+      scamWarningItem,
       pinnedMessagesItem,
       requestsItem = new CollapseListView.ViewItem(requestsView, requestsViewHeight),
       liveLocationItem = new CollapseListView.ViewItem(liveLocationView, liveLocationHeight),
@@ -2209,6 +2253,16 @@ public class MessagesController extends ViewController<MessagesController.Argume
     if (tdlib.ui().processLeaveButton(this, null, getChatId(), id, null)) {
       return;
     }
+    if (id == R.id.btn_citchatPixCharge) {
+      PixCharge.charge(this);
+      return;
+    } else if (id == R.id.btn_citchatPixSplit) {
+      PixCharge.splitBill(this);
+      return;
+    } else if (id == R.id.btn_citchatStickerFromGallery) {
+      StickerFromPhoto.pickFromGallery(this);
+      return;
+    }
     if (id == R.id.btn_copyLink || id == R.id.btn_share) {
       tdlib.client().send(new TdApi.GetBackgroundUrl(getArgumentsStrict().wallpaperObject.name, TGBackground.makeBlurredBackgroundType(getArgumentsStrict().wallpaperObject.type, backgroundParamsView != null && backgroundParamsView.isBlurred())), result -> {
         if (result.getConstructor() == TdApi.HttpUrl.CONSTRUCTOR) {
@@ -2759,6 +2813,7 @@ public class MessagesController extends ViewController<MessagesController.Argume
     resetEditState();
     forceHideToast();
     topBar.hideAll(false);
+    scamWarningReason = ScamGuard.MESSAGE_SAFE;
 
     resetSearchControls();
     updateSelectMessageSenderInterface(false);
@@ -4514,6 +4569,20 @@ public class MessagesController extends ViewController<MessagesController.Argume
       strings.append(R.string.DirectMessages);
     }
 
+    // CITchat: Pix charges, splitting the bill in groups and stickers made from photos
+    if (!messagesHidden && canWriteMessages()) {
+      ids.append(R.id.btn_citchatPixCharge);
+      strings.append(R.string.CITchatPixCharge);
+      if (tdlib.isMultiChat(chat.id)) {
+        ids.append(R.id.btn_citchatPixSplit);
+        strings.append(R.string.CITchatPixSplit);
+      }
+      if (StickerFromPhoto.isSupported()) {
+        ids.append(R.id.btn_citchatStickerFromGallery);
+        strings.append(R.string.CITchatStickerFromGallery);
+      }
+    }
+
     if (BuildConfig.DEBUG) {
       if (TD.isSecretChat(chat.type)) {
         ids.append(R.id.btn_sendScreenshotNotification);
@@ -5817,6 +5886,15 @@ public class MessagesController extends ViewController<MessagesController.Argume
         return true;
       } else if (id == R.id.btn_citchatTranscribe) {
         VoiceTranscription.transcribe(this, selectedMessage.getMessage());
+        return true;
+      } else if (id == R.id.btn_citchatCopyPix) {
+        PixCode.Found found = PixMessages.find(selectedMessage.getMessage());
+        if (found != null) {
+          PixMessages.copy(found);
+        }
+        return true;
+      } else if (id == R.id.btn_citchatStickerFromPhoto) {
+        StickerFromPhoto.fromMessage(this, selectedMessage.getMessage());
         return true;
       } else if (id == R.id.btn_saveFile) {
         if (selectedMessageTag != null) {
@@ -8474,6 +8552,80 @@ public class MessagesController extends ViewController<MessagesController.Argume
     tdlib.ui().switchInline(this, username, switchInline.query, false);
   }
 
+  // CITchat: scam warning for private chats with people who are not contacts
+
+  private CustomTextView scamWarningText;
+  private FrameLayoutFix scamWarningView;
+  private CollapseListView.Item scamWarningItem;
+  private int scamWarningReason = ScamGuard.MESSAGE_SAFE;
+
+  private boolean needScamCheck () {
+    if (chat == null || messageThread != null || inPreviewMode || isInForceTouchMode()) {
+      return false;
+    }
+    long userId = tdlib.chatUserId(chat);
+    if (userId == 0 || tdlib.isSelfChat(chat.id) || tdlib.isServiceNotificationsChat(chat.id) || tdlib.isBotChat(chat)) {
+      return false;
+    }
+    TdApi.User user = tdlib.cache().user(userId);
+    return user != null && !user.isContact;
+  }
+
+  /** Newest message the user already saw a warning for; only newer ones can bring it back. */
+  private String scamWarningDismissKey () {
+    return "citchat_scam_dismissed_" + tdlib.id() + "_" + chat.id;
+  }
+
+  private int scamReasonOf (TGMessage message, long dismissedMessageId) {
+    if (message.isOutgoing() || message.getBiggestId() <= dismissedMessageId) {
+      return ScamGuard.MESSAGE_SAFE;
+    }
+    TdApi.FormattedText text = Td.textOrCaption(message.getMessage().content);
+    return text != null ? ScamGuard.checkMessage(text.text) : ScamGuard.MESSAGE_SAFE;
+  }
+
+  public void checkScamWarning (TGMessage message) {
+    if (needScamCheck()) {
+      showScamWarning(scamReasonOf(message, Settings.instance().getLong(scamWarningDismissKey(), 0)));
+    }
+  }
+
+  public void checkScamWarning (List<TGMessage> messages) {
+    if (!needScamCheck()) {
+      return;
+    }
+    long dismissedMessageId = Settings.instance().getLong(scamWarningDismissKey(), 0);
+    int reason = ScamGuard.MESSAGE_SAFE;
+    for (TGMessage message : messages) {
+      int found = scamReasonOf(message, dismissedMessageId);
+      if (found != ScamGuard.MESSAGE_SAFE && (reason == ScamGuard.MESSAGE_SAFE || found < reason)) {
+        reason = found;
+      }
+    }
+    showScamWarning(reason);
+  }
+
+  private void showScamWarning (int reason) {
+    // Lower numbers are worse: a warning only gives way to a more serious one.
+    if (reason == ScamGuard.MESSAGE_SAFE || (scamWarningReason != ScamGuard.MESSAGE_SAFE && scamWarningReason <= reason)) {
+      return;
+    }
+    scamWarningReason = reason;
+    TdApi.FormattedText text = ScamWarnings.messageWarning(reason);
+    scamWarningText.setText(text.text, TextEntity.valueOf(tdlib, text, null), false);
+    topBar.setItemVisible(scamWarningItem, true, isFocused());
+  }
+
+  private void dismissScamWarning () {
+    if (chat != null) {
+      TGMessage newest = manager.getAdapter().getBottomMessage();
+      long newestId = newest != null ? newest.getBiggestId() : chat.lastMessage != null ? chat.lastMessage.id : 0;
+      Settings.instance().putLong(scamWarningDismissKey(), newestId);
+    }
+    scamWarningReason = ScamGuard.MESSAGE_SAFE;
+    topBar.setItemVisible(scamWarningItem, false, true);
+  }
+
   // Toast, Report Spam, Share my contact info
 
   public void showCallbackToast (CharSequence text) {
@@ -9232,6 +9384,11 @@ public class MessagesController extends ViewController<MessagesController.Argume
       return false;
     }
     return sendContent(view, RightId.SEND_OTHER_MESSAGES, R.string.ChatDisabledStickers, R.string.ChatRestrictedStickers, R.string.ChatRestrictedStickersUntil, allowReply, initialSendOptions, () -> new TdApi.InputMessageSticker(new TdApi.InputSticker(new TdApi.InputFileId(sticker.sticker.id), null, 0, 0), emoji));
+  }
+
+  /** CITchat: sends a sticker made on the device (see StickerFromPhoto). */
+  public void sendStickerFile (String path) {
+    sendSticker(path, true, Td.newSendOptions());
   }
 
   private void sendSticker (String path, boolean allowReply, TdApi.MessageSendOptions initialSendOptions) {

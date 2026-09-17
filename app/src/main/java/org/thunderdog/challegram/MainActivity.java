@@ -1499,6 +1499,8 @@ public class MainActivity extends BaseActivity implements GlobalAccountListener,
     tdlib.context().dateManager().checkCurrentDate();
     UI.startNotificationService();
     TemporaryNotification.hide(this);
+    // CITchat: warns when the phone gets close to the end of its data allowance (if the user set one up)
+    org.thunderdog.challegram.citchat.DataSaving.checkCap(this);
   }
 
   @Override

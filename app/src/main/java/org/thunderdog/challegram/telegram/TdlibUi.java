@@ -59,6 +59,7 @@ import org.thunderdog.challegram.component.preview.PreviewLayout;
 import org.thunderdog.challegram.component.sticker.StickerSetWrap;
 import org.thunderdog.challegram.config.Config;
 import org.thunderdog.challegram.core.Background;
+import org.thunderdog.challegram.citchat.ScamWarnings;
 import org.thunderdog.challegram.core.Lang;
 import org.thunderdog.challegram.core.LangUtils;
 import org.thunderdog.challegram.data.TD;
@@ -2718,6 +2719,8 @@ public class TdlibUi extends Handler {
     public boolean requireOpenPrompt, ignoreExplicitUserInteraction, forceDirectMessagesChat;
     public Runnable openPromptCancellationCallback;
     public String displayUrl;
+    /** CITchat: the scam check already ran for this link (and the user chose to open it). */
+    public boolean citchatLinkChecked;
 
     private ViewController<?> parentController;
     private TGMessage sourceMessage;
@@ -2738,6 +2741,7 @@ public class TdlibUi extends Handler {
         this.parentController = options.parentController;
         this.originalUrl = options.originalUrl;
         this.sourceLinkPreview = options.sourceLinkPreview;
+        this.citchatLinkChecked = options.citchatLinkChecked;
         if (options.sourceMessage != null) {
           sourceMessage(options.sourceMessage);
         }
@@ -3174,6 +3178,10 @@ public class TdlibUi extends Handler {
   }
   
   public void openUrl (final TdlibDelegate context, final String url, @Nullable UrlOpenParameters options, @Nullable RunnableBool after) {
+    // CITchat: links that imitate banks and government sites, hide their address, etc. ask first.
+    if (ScamWarnings.confirmLink(context, url, options, after, approved -> openUrl(context, url, approved, after))) {
+      return;
+    }
     openTelegramUrl(context, url, options, processed -> {
       if (!processed) {
         openExternalUrl(context, url, options, after);

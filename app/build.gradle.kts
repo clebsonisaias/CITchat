@@ -995,6 +995,8 @@ dependencies {
     libs.google.mlkit.language.id.legacy,
     libs.google.mlkit.language.id.latest
   )
+  // CITchat: stickers from photos, with the subject cut out on the device (minSdk 24, so only the latest flavor)
+  sinceNougatImplementation(libs.google.play.services.mlkit.subject.segmentation.latest)
   // Firebase: https://firebase.google.com/support/release-notes/android
   flavorImplementation(
     libs.google.firebase.messaging.legacy,

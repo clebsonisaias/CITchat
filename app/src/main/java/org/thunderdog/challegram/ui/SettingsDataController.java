@@ -17,6 +17,7 @@ package org.thunderdog.challegram.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.SparseIntArray;
 import android.view.View;
 
@@ -26,6 +27,7 @@ import androidx.annotation.Nullable;
 import org.drinkless.tdlib.Client;
 import org.drinkless.tdlib.TdApi;
 import org.thunderdog.challegram.R;
+import org.thunderdog.challegram.citchat.DataSaving;
 import org.thunderdog.challegram.component.base.SettingView;
 import org.thunderdog.challegram.core.Lang;
 import org.thunderdog.challegram.data.TGNetworkStats;
@@ -47,6 +49,7 @@ import org.thunderdog.challegram.voip.annotation.DataSavingOption;
 import java.util.List;
 
 import me.vkryl.core.ArrayUtils;
+import me.vkryl.core.StringUtils;
 
 public class SettingsDataController extends RecyclerViewController<SettingsDataController.Args> implements View.OnClickListener, ViewController.SettingsIntDelegate,
   GlobalConnectionListener, Client.ResultHandler, Settings.ProxyChangeListener {
@@ -214,6 +217,15 @@ public class SettingsDataController extends RecyclerViewController<SettingsDataC
           view.setData(networkStats != null ? networkStats.getWiFiEntry() : Lang.getString(R.string.Calculating));
         } else if (itemId == R.id.btn_resetNetworkStats) {
           view.setData(networkStats != null ? networkStats.getDateEntry() : Lang.getString(R.string.LoadingInformation));
+          // CITchat: internet saving
+        } else if (itemId == R.id.btn_citchatDataMode) {
+          view.setData(DataSaving.modeName(DataSaving.currentMode(tdlib)));
+        } else if (itemId == R.id.btn_citchatDataUsage) {
+          view.setData(dataUsage != null ? DataSaving.describeUsage(dataUsage) : Lang.getString(R.string.Calculating));
+        } else if (itemId == R.id.btn_citchatDataCap) {
+          long cap = DataSaving.capMegabytes();
+          view.setData(cap <= 0 ? Lang.getString(R.string.CITchatDataCapNotSet) :
+            Lang.getString(DataSaving.hasUsageAccess(context) ? R.string.CITchatDataCapValue : R.string.CITchatDataCapNeedsAccess, DataSaving.formatCap(cap), DataSaving.capRenewalDay()));
         }
       }
     };
@@ -242,6 +254,15 @@ public class SettingsDataController extends RecyclerViewController<SettingsDataC
       };
     } else {
       rawItems = new ListItem[] {
+        new ListItem(ListItem.TYPE_VALUED_SETTING, R.id.btn_citchatDataMode, R.drawable.baseline_signal_cellular_alt_24, R.string.CITchatDataMode),
+        new ListItem(ListItem.TYPE_SEPARATOR_FULL),
+        new ListItem(ListItem.TYPE_VALUED_SETTING, R.id.btn_citchatDataUsage, R.drawable.baseline_import_export_24, R.string.CITchatDataUsage),
+        new ListItem(ListItem.TYPE_SEPARATOR_FULL),
+        new ListItem(ListItem.TYPE_VALUED_SETTING, R.id.btn_citchatDataCap, R.drawable.baseline_data_usage_24, R.string.CITchatDataCap),
+        new ListItem(ListItem.TYPE_SHADOW_BOTTOM),
+        new ListItem(ListItem.TYPE_DESCRIPTION, 0, 0, R.string.CITchatDataDesc),
+
+        new ListItem(ListItem.TYPE_SHADOW_TOP),
         new ListItem(ListItem.TYPE_VALUED_SETTING, R.id.btn_storageUsage, R.drawable.baseline_data_usage_24, R.string.StorageUsage),
         new ListItem(ListItem.TYPE_SEPARATOR_FULL),
         new ListItem(ListItem.TYPE_VALUED_SETTING, R.id.btn_dataUsageTotal, R.drawable.baseline_import_export_24, R.string.NetworkUsage),
@@ -469,6 +490,44 @@ public class SettingsDataController extends RecyclerViewController<SettingsDataC
         }
         return true;
       });
+    } else if (id == R.id.btn_citchatDataMode) {
+      int mode = DataSaving.currentMode(tdlib);
+      showSettings(new SettingsWrapBuilder(id).addHeaderItem(new ListItem(ListItem.TYPE_INFO, 0, 0, R.string.CITchatDataModeDesc)).setRawItems(new ListItem[] {
+        new ListItem(ListItem.TYPE_RADIO_OPTION, R.id.btn_citchatDataModeNormal, 0, R.string.CITchatDataModeNormal, id, mode == DataSaving.MODE_NORMAL),
+        new ListItem(ListItem.TYPE_RADIO_OPTION, R.id.btn_citchatDataModeVideoWifi, 0, R.string.CITchatDataModeVideoWifi, id, mode == DataSaving.MODE_VIDEO_ON_WIFI),
+        new ListItem(ListItem.TYPE_RADIO_OPTION, R.id.btn_citchatDataModeMaximum, 0, R.string.CITchatDataModeMaximum, id, mode == DataSaving.MODE_MAXIMUM)
+      }).setIntDelegate(this));
+    } else if (id == R.id.btn_citchatDataUsage) {
+      if (!DataSaving.hasUsageAccess(context)) {
+        showOptions(Lang.getString(R.string.CITchatDataAccessInfo), new int[] {R.id.btn_done, R.id.btn_cancel}, new String[] {Lang.getString(R.string.CITchatDataAccessAllow), Lang.getString(R.string.Cancel)}, new int[] {OptionColor.BLUE, OptionColor.NORMAL}, new int[] {R.drawable.baseline_data_usage_24, R.drawable.baseline_cancel_24}, (itemView, optionId) -> {
+          if (optionId == R.id.btn_done) {
+            DataSaving.openUsageAccessSettings(context);
+          }
+          return true;
+        });
+      } else {
+        loadDataUsage();
+      }
+    } else if (id == R.id.btn_citchatDataCap) {
+      long cap = DataSaving.capMegabytes();
+      openInputAlert(Lang.getString(R.string.CITchatDataCap), Lang.getString(R.string.CITchatDataCapHint), R.string.Done, R.string.Cancel, cap > 0 ? String.valueOf(Math.round(cap / 1024f * 10f) / 10f).replace('.', ',').replace(",0", "") : null, (inputView, result) -> {
+        long megabytes = DataSaving.parseCapMegabytes(result);
+        if (megabytes <= 0) {
+          return false;
+        }
+        runOnUiThreadOptional(() -> openInputAlert(Lang.getString(R.string.CITchatDataCapDay), Lang.getString(R.string.CITchatDataCapDayHint), R.string.Done, R.string.Cancel, String.valueOf(DataSaving.capRenewalDay()), (dayView, dayResult) -> {
+          int day = StringUtils.parseInt(dayResult.trim(), -1);
+          if (day < 1 || day > 31) {
+            return false;
+          }
+          DataSaving.setCap(megabytes, Math.min(day, 28));
+          adapter.updateValuedSettingById(R.id.btn_citchatDataCap);
+          adapter.updateValuedSettingById(R.id.btn_citchatDataUsage);
+          loadDataUsage();
+          return true;
+        }, true).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER), null, 250L);
+        return true;
+      }, false).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
     } else if (id == R.id.btn_storageUsage) {
       SettingsCacheController cacheController = new SettingsCacheController(context, tdlib);
       cacheController.setArguments(this);
@@ -603,8 +662,48 @@ public class SettingsDataController extends RecyclerViewController<SettingsDataC
     };
   }
 
+  // CITchat: internet saving
+
+  private DataSaving.Usage dataUsage;
+
+  private void loadDataUsage () {
+    android.content.Context appContext = context.getApplicationContext();
+    new Thread(() -> {
+      DataSaving.Usage usage = DataSaving.readUsage(appContext);
+      runOnUiThreadOptional(() -> {
+        dataUsage = usage;
+        adapter.updateValuedSettingById(R.id.btn_citchatDataUsage);
+        adapter.updateValuedSettingById(R.id.btn_citchatDataCap);
+      });
+    }, "CITchatDataUsage").start();
+  }
+
+  @Override
+  public void onFocus () {
+    super.onFocus();
+    if (mode == MODE_NONE && adapter != null) {
+      // Coming back from the system screen where usage access is granted.
+      loadDataUsage();
+    }
+  }
+
   @Override
   public void onApplySettings (@IdRes int id, SparseIntArray result) {
+    if (id == R.id.btn_citchatDataMode) {
+      final int res = result.get(R.id.btn_citchatDataMode);
+      final int mode =
+        res == R.id.btn_citchatDataModeNormal ? DataSaving.MODE_NORMAL :
+        res == R.id.btn_citchatDataModeVideoWifi ? DataSaving.MODE_VIDEO_ON_WIFI :
+        res == R.id.btn_citchatDataModeMaximum ? DataSaving.MODE_MAXIMUM :
+        DataSaving.MODE_CUSTOM;
+      if (mode != DataSaving.MODE_CUSTOM) {
+        DataSaving.applyMode(tdlib, mode);
+        for (int itemId : new int[] {R.id.btn_citchatDataMode, R.id.btn_dataSaver, R.id.btn_dataSaverForce, R.id.btn_lessDataForCalls, R.id.btn_mediaMobileLimits}) {
+          adapter.updateValuedSettingById(itemId);
+        }
+      }
+      return;
+    }
     if (id == R.id.btn_dataSaverForce) {
       final boolean forceMobile = result.get(R.id.btn_forceMobile) != 0;
       final boolean forceRoaming = result.get(R.id.btn_forceRoaming) != 0;

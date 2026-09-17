@@ -23,6 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.drinkless.tdlib.TdApi;
+import org.thunderdog.challegram.citchat.PixCode;
+import org.thunderdog.challegram.citchat.PixMessages;
 import org.thunderdog.challegram.component.chat.MessageView;
 import org.thunderdog.challegram.component.chat.MessagesManager;
 import org.thunderdog.challegram.config.Config;
@@ -370,6 +372,32 @@ public class TGMessageText extends TGMessage {
     } else if (linkPreview != null && linkPreview.getMaxWidth() != linkPreviewMaxWidth) {
       linkPreview.buildLayout(linkPreviewMaxWidth);
     }
+
+    buildCopyCodeButton(maxWidth);
+  }
+
+  // CITchat: "Copiar Pix" button under messages with a Pix or boleto code
+
+  private static final float COPY_CODE_MARGIN_DP = 8f;
+  private @Nullable TGInlineKeyboard copyCodeButton;
+
+  private void buildCopyCodeButton (int maxWidth) {
+    PixCode.Found found = linkPreview == null && text != null ? PixCode.findFirst(text.text) : null;
+    if (found == null) {
+      copyCodeButton = null;
+      return;
+    }
+    if (copyCodeButton == null) {
+      copyCodeButton = new TGInlineKeyboard(this, false);
+      copyCodeButton.setViewProvider(currentViews);
+    }
+    int textWidth = Math.round(visibleText.getMetadata().getTotalWidth());
+    int buttonWidth = Math.min(maxWidth, Math.max(textWidth, Screen.dp(220f)));
+    copyCodeButton.setCustom(0, PixMessages.buttonText(found), buttonWidth, false, (view, keyboard, button) -> PixMessages.copy(found));
+  }
+
+  private int getCopyCodeButtonHeight () {
+    return copyCodeButton != null ? Screen.dp(COPY_CODE_MARGIN_DP) + TGInlineKeyboard.getButtonHeight() : 0;
   }
 
   private boolean setLinkPreview (TdApi.LinkPreview linkPreview, @Nullable TdApi.LinkPreviewOptions linkPreviewOptions) {
@@ -553,6 +581,9 @@ public class TGMessageText extends TGMessage {
       int linkPreviewX = Lang.rtl() ? startX + maxWidth - linkPreview.getWidth() : startX;
       linkPreview.draw(view, c, linkPreviewX, linkPreviewY, preview, receiver, alpha, textMediaReceiver);
     }
+    if (copyCodeButton != null) {
+      copyCodeButton.draw(view, c, startX, startY + getTextContentHeight() + Screen.dp(COPY_CODE_MARGIN_DP));
+    }
   }
 
   @Override
@@ -562,6 +593,10 @@ public class TGMessageText extends TGMessage {
 
   @Override
   protected int getContentHeight () {
+    return getTextContentHeight() + getCopyCodeButtonHeight();
+  }
+
+  private int getTextContentHeight () {
     int height = Math.round(visibleText.getMetadata().getTotalHeight() + getTextTopOffset() * visibleText.getMetadata().getTotalVisibility());
     if (linkPreview != null) {
       if (height > 0)
@@ -586,6 +621,10 @@ public class TGMessageText extends TGMessage {
 
   @Override
   protected int getBottomLineContentWidth () {
+    if (copyCodeButton != null) {
+      // The time goes under the button, not beside the last line of text.
+      return BOTTOM_LINE_EXPAND_HEIGHT;
+    }
     int textLastLineWidth = calculateTextLastLineWidth();
     float linkPreviewAboveText = this.linkPreviewAboveText.getFloatValue();
     if (linkPreviewAboveText == 0f || linkPreview == null) {
@@ -632,6 +671,9 @@ public class TGMessageText extends TGMessage {
     if (linkPreview != null) {
       return Math.max(textWidth, linkPreview.getWidth());
     }
+    if (copyCodeButton != null) {
+      return Math.max(textWidth, copyCodeButton.getWidth());
+    }
     return textWidth;
   }
 
@@ -667,7 +709,8 @@ public class TGMessageText extends TGMessage {
   public boolean performLongPress (View view, float x, float y) {
     boolean res = super.performLongPress(view, x, y);
     TextWrapper wrapper = effectiveWrapper;
-    return (wrapper != null && wrapper.performLongPress(view)) || (linkPreview != null && linkPreview.performLongPress(view, this)) || res;
+    boolean copyButton = copyCodeButton != null && copyCodeButton.performLongPress(view);
+    return (wrapper != null && wrapper.performLongPress(view)) || (linkPreview != null && linkPreview.performLongPress(view, this)) || copyButton || res;
   }
 
   @Override
@@ -683,6 +726,9 @@ public class TGMessageText extends TGMessage {
   @Override
   public boolean onTouchEvent (MessageView view, MotionEvent e) {
     if (super.onTouchEvent(view, e)) {
+      return true;
+    }
+    if (copyCodeButton != null && copyCodeButton.onTouchEvent(view, e)) {
       return true;
     }
     TextWrapper wrapper = effectiveWrapper;

@@ -31,6 +31,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.drinkless.tdlib.TdApi;
 import org.thunderdog.challegram.R;
+import org.thunderdog.challegram.citchat.PixCode;
+import org.thunderdog.challegram.citchat.PixMessages;
+import org.thunderdog.challegram.citchat.StickerFromPhoto;
 import org.thunderdog.challegram.citchat.VoiceTranscription;
 import org.thunderdog.challegram.config.Config;
 import org.thunderdog.challegram.core.Lang;
@@ -909,6 +912,20 @@ public class MessageView extends SparseDrawableView implements Destroyable, Draw
       ids.append(R.id.btn_citchatTranscribe);
       strings.append(R.string.CITchatTranscribe);
       icons.append(R.drawable.baseline_mic_24);
+    }
+
+    if (!isMore && messageCount == 1) {
+      PixCode.Found pixCode = PixMessages.find(msg.getMessage());
+      if (pixCode != null) {
+        ids.append(R.id.btn_citchatCopyPix);
+        strings.append(PixMessages.optionText(pixCode));
+        icons.append(R.drawable.baseline_content_copy_24);
+      }
+      if (msg.canBeSaved() && StickerFromPhoto.canUse(msg.getMessage())) {
+        ids.append(R.id.btn_citchatStickerFromPhoto);
+        strings.append(R.string.CITchatStickerFromPhoto);
+        icons.append(R.drawable.baseline_image_24);
+      }
     }
 
     if (messageCount == 1) {

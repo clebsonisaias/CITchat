@@ -20,4 +20,81 @@
   <string name="CITchatAdSponsored">Sponsored</string>
   <string name="CITchatAdText">SIM with 25 GB for R$ 39.90/month</string>
   <string name="CITchatAdHide">Hide ad</string>
+
+  <string name="CITchatNext">Next</string>
+
+  <!-- Pix and boleto: copy button, requests and splitting the bill -->
+  <string name="CITchatCopyPix">Copy Pix</string>
+  <string name="CITchatCopyBoleto">Copy boleto</string>
+  <string name="CITchatPixCopied">Pix code copied. Paste it in your bank app.</string>
+  <string name="CITchatBoletoCopied">Boleto number copied. Paste it in your bank app.</string>
+  <string name="CITchatPixCharge">Request with Pix</string>
+  <string name="CITchatPixSplit">Split the bill</string>
+  <string name="CITchatPixKeyTitle">Your Pix key</string>
+  <string name="CITchatPixKeyHint">CPF, CNPJ, phone (+55…), e-mail or random key</string>
+  <string name="CITchatPixNameTitle">Receiver name</string>
+  <string name="CITchatPixNameHint">As it appears in your bank</string>
+  <string name="CITchatPixCityTitle">City</string>
+  <string name="CITchatPixCityHint">Where your account is, e.g. Natal</string>
+  <string name="CITchatPixAmountHint">Amount in reais, e.g. 25,90</string>
+  <string name="CITchatPixTotalHint">Total of the bill, e.g. 120,00</string>
+  <string name="CITchatPixPeopleHint">How many people split it, counting you</string>
+  <string name="CITchatPixChargeConfirm">Request of %1$s\nTo: %2$s\nKey: %3$s\n\nThe money goes straight to your account. CITchat only creates the QR code and the copy-paste code.</string>
+  <string name="CITchatPixSplitConfirm">Total of %1$s split by %2$d people: %3$s each\nPix to: %4$s\nKey: %5$s\n\nThe QR code and the code for %3$s go to the group, so everyone pays their part.</string>
+  <string name="CITchatPixSendCharge">Send request</string>
+  <string name="CITchatPixSendSplit">Send to the group</string>
+  <string name="CITchatPixEditData">Change my Pix details</string>
+  <string name="CITchatPixChargeCaption">Pix of %1$s to %2$s.\nScan the QR code in your bank app or copy the code below.</string>
+  <string name="CITchatPixSplitCaption">Split the bill: %1$s among %2$d people.\nEach one pays %3$s to %4$s.\nScan the QR code in your bank app or copy the code below.</string>
+  <string name="CITchatPixFailed">Couldn\'t create the Pix code. Check your Pix details.</string>
+
+  <!-- Scam protection -->
+  <string name="CITchatScamTitle">Careful, this may be a scam.</string>
+  <string name="CITchatScamMoney">This person is not in your contacts and is talking about money. Before paying, call the number you already know.</string>
+  <string name="CITchatScamNewNumber">Someone who says they changed numbers and is not in your contacts may be pretending to be someone you know. Confirm by calling the old number.</string>
+  <string name="CITchatScamCodeTitle">Never share verification codes.</string>
+  <string name="CITchatScamCode">With them, scammers take over your WhatsApp, Telegram or bank account.</string>
+  <string name="CITchatLinkWarning">Careful, this link may be a scam.</string>
+  <string name="CITchatLinkLookalike">It uses the name %1$s, but it leads to %2$s, which is not an official address. This is how scammers steal passwords and card details.</string>
+  <string name="CITchatLinkPunycode">The address %1$s uses letters that imitate others, a common trick to pass as a well-known site.</string>
+  <string name="CITchatLinkHiddenHost">This link hides its real address: it leads to %1$s.</string>
+  <string name="CITchatLinkIpAddress">This link leads to a numeric address (%1$s) instead of a site with a name, which is common in scams.</string>
+  <string name="CITchatLinkScamWords">The address %1$s uses words common in scams, like unblocking, prize or refund.</string>
+  <string name="CITchatLinkShortener">This link is shortened (%1$s): the real destination stays hidden until you open it.</string>
+  <string name="CITchatLinkOpenAnyway">Open anyway</string>
+
+  <!-- Stickers from photos -->
+  <string name="CITchatStickerFromPhoto">Make a sticker</string>
+  <string name="CITchatStickerFromGallery">Sticker from a photo</string>
+  <string name="CITchatStickerWorking">Cutting out the photo…</string>
+  <string name="CITchatStickerPreparing">Google Play is downloading the cutout feature. Try again in a minute.</string>
+  <string name="CITchatStickerNoSubject">No person or object to cut out was found in this photo.</string>
+  <string name="CITchatStickerFailed">Couldn\'t create the sticker</string>
+  <string name="CITchatStickerPreviewTitle">Your sticker</string>
+  <string name="CITchatStickerSend">Send sticker</string>
+
+  <!-- Internet saving -->
+  <string name="CITchatDataMode">Internet saving</string>
+  <string name="CITchatDataModeDesc">Ready-made combinations of the settings on this screen. You can still adjust each one afterwards.</string>
+  <string name="CITchatDataModeNormal">Normal</string>
+  <string name="CITchatDataModeVideoWifi">Videos only on Wi-Fi</string>
+  <string name="CITchatDataModeMaximum">Maximum saving</string>
+  <string name="CITchatDataModeCustom">Custom</string>
+  <string name="CITchatDataUsage">Mobile data this cycle</string>
+  <string name="CITchatDataUsageApp">CITchat used %1$s</string>
+  <string name="CITchatDataUsagePhone">Phone: %1$s of %2$s (%3$d%%) · CITchat: %4$s</string>
+  <string name="CITchatDataUsageUnavailable">Android didn\'t report the usage</string>
+  <string name="CITchatDataCap">Data allowance</string>
+  <string name="CITchatDataCapHint">In GB, e.g. 20</string>
+  <string name="CITchatDataCapDay">Renewal day</string>
+  <string name="CITchatDataCapDayHint">Day of the month, from 1 to 28</string>
+  <string name="CITchatDataCapNotSet">Tap to be warned before it runs out</string>
+  <string name="CITchatDataCapValue">%1$s, renews on day %2$d · warning from 80%%</string>
+  <string name="CITchatDataCapNeedsAccess">%1$s, renews on day %2$d · allow usage access to be warned</string>
+  <string name="CITchatDataDesc">The warning compares the mobile data of the whole phone with your allowance, using Android\'s usage access. Nothing leaves the phone.</string>
+  <string name="CITchatDataAccessInfo">To measure the mobile data of the whole phone, not only CITchat, allow usage access for CITchat on the next screen. CITchat only reads the data totals.</string>
+  <string name="CITchatDataAccessAllow">Allow usage access</string>
+  <string name="CITchatDataCapTitle">Your mobile data is running out</string>
+  <string name="CITchatDataCapReachedTitle">You reached your data allowance</string>
+  <string name="CITchatDataCapText">You used %1$d%% of this cycle\'s allowance (%2$s of %3$s). Turn on maximum saving in CITchat\'s data settings.</string>
 </resources>

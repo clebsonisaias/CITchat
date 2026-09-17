@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <item name="btn_citchatTranscribe" type="id" />
+
+  <!-- Pix and boleto -->
+  <item name="btn_citchatCopyPix" type="id" />
+  <item name="btn_citchatPixCharge" type="id" />
+  <item name="btn_citchatPixSplit" type="id" />
+  <item name="btn_citchatPixSend" type="id" />
+  <item name="btn_citchatPixEdit" type="id" />
+
+  <!-- Scam protection -->
+  <item name="btn_citchatLinkOpen" type="id" />
+
+  <!-- Stickers from photos -->
+  <item name="btn_citchatStickerFromPhoto" type="id" />
+  <item name="btn_citchatStickerFromGallery" type="id" />
+
+  <!-- Internet saving -->
+  <item name="btn_citchatDataMode" type="id" />
+  <item name="btn_citchatDataModeNormal" type="id" />
+  <item name="btn_citchatDataModeVideoWifi" type="id" />
+  <item name="btn_citchatDataModeMaximum" type="id" />
+  <item name="btn_citchatDataUsage" type="id" />
+  <item name="btn_citchatDataCap" type="id" />
 </resources>

@@ -16,4 +16,77 @@
   <string name="CITchatAdSponsored">Patrocinado</string>
   <string name="CITchatAdText">Chip com 25 GB por R$ 39,90/mês</string>
   <string name="CITchatAdHide">Ocultar anúncio</string>
+
+  <string name="CITchatNext">Avançar</string>
+
+  <string name="CITchatCopyPix">Copiar Pix</string>
+  <string name="CITchatCopyBoleto">Copiar boleto</string>
+  <string name="CITchatPixCopied">Código Pix copiado. Cole no app do seu banco.</string>
+  <string name="CITchatBoletoCopied">Código do boleto copiado. Cole no app do seu banco.</string>
+  <string name="CITchatPixCharge">Cobrar com Pix</string>
+  <string name="CITchatPixSplit">Racha conta</string>
+  <string name="CITchatPixKeyTitle">Sua chave Pix</string>
+  <string name="CITchatPixKeyHint">CPF, CNPJ, celular (+55…), e-mail ou chave aleatória</string>
+  <string name="CITchatPixNameTitle">Nome de quem recebe</string>
+  <string name="CITchatPixNameHint">Como aparece no seu banco</string>
+  <string name="CITchatPixCityTitle">Cidade</string>
+  <string name="CITchatPixCityHint">Da sua conta, por exemplo Natal</string>
+  <string name="CITchatPixAmountHint">Valor em reais, por exemplo 25,90</string>
+  <string name="CITchatPixTotalHint">Total da conta, por exemplo 120,00</string>
+  <string name="CITchatPixPeopleHint">Quantas pessoas dividem, contando você</string>
+  <string name="CITchatPixChargeConfirm">Cobrança de %1$s\nPara: %2$s\nChave: %3$s\n\nO dinheiro vai direto para a sua conta. O CITchat só gera o QR e o código copia e cola.</string>
+  <string name="CITchatPixSplitConfirm">Total de %1$s dividido por %2$d pessoas: %3$s para cada\nPix para: %4$s\nChave: %5$s\n\nO QR e o código de %3$s vão para o grupo, para cada um pagar a sua parte.</string>
+  <string name="CITchatPixSendCharge">Enviar cobrança</string>
+  <string name="CITchatPixSendSplit">Enviar no grupo</string>
+  <string name="CITchatPixEditData">Alterar meus dados do Pix</string>
+  <string name="CITchatPixChargeCaption">Pix de %1$s para %2$s.\nLeia o QR no app do banco ou copie o código logo abaixo.</string>
+  <string name="CITchatPixSplitCaption">Racha conta: %1$s entre %2$d pessoas.\nCada um paga %3$s para %4$s.\nLeia o QR no app do banco ou copie o código logo abaixo.</string>
+  <string name="CITchatPixFailed">Não foi possível gerar o código Pix. Confira seus dados do Pix.</string>
+
+  <string name="CITchatScamTitle">Cuidado: pode ser golpe.</string>
+  <string name="CITchatScamMoney">Esta pessoa não está nos seus contatos e falou de dinheiro. Antes de pagar, ligue para o número que você já conhece.</string>
+  <string name="CITchatScamNewNumber">Quem diz que mudou de número e não está nos seus contatos pode estar se passando por alguém. Confirme ligando para o número antigo.</string>
+  <string name="CITchatScamCodeTitle">Nunca passe códigos de verificação.</string>
+  <string name="CITchatScamCode">Com eles, golpistas tomam a sua conta do WhatsApp, do Telegram ou do banco.</string>
+  <string name="CITchatLinkWarning">Cuidado: este link pode ser golpe.</string>
+  <string name="CITchatLinkLookalike">Ele usa o nome %1$s, mas leva para %2$s, que não é um endereço oficial. É assim que golpistas roubam senhas e dados de cartão.</string>
+  <string name="CITchatLinkPunycode">O endereço %1$s usa letras que imitam outras, um truque comum para se passar por sites conhecidos.</string>
+  <string name="CITchatLinkHiddenHost">Este link esconde o endereço real: ele leva para %1$s.</string>
+  <string name="CITchatLinkIpAddress">Este link leva para um endereço numérico (%1$s) em vez de um site com nome, algo comum em golpes.</string>
+  <string name="CITchatLinkScamWords">O endereço %1$s usa palavras comuns em golpes, como desbloqueio, prêmio ou resgate.</string>
+  <string name="CITchatLinkShortener">Este link é encurtado (%1$s): o destino real fica escondido até você abrir.</string>
+  <string name="CITchatLinkOpenAnyway">Abrir mesmo assim</string>
+
+  <string name="CITchatStickerFromPhoto">Criar figurinha</string>
+  <string name="CITchatStickerFromGallery">Figurinha de uma foto</string>
+  <string name="CITchatStickerWorking">Recortando a foto…</string>
+  <string name="CITchatStickerPreparing">O Google Play está baixando o recurso de recorte. Tente de novo em um minuto.</string>
+  <string name="CITchatStickerNoSubject">Não encontramos uma pessoa ou objeto para recortar nesta foto.</string>
+  <string name="CITchatStickerFailed">Não foi possível criar a figurinha</string>
+  <string name="CITchatStickerPreviewTitle">Sua figurinha</string>
+  <string name="CITchatStickerSend">Enviar figurinha</string>
+
+  <string name="CITchatDataMode">Economia de internet</string>
+  <string name="CITchatDataModeDesc">Combinações prontas das opções desta tela. Depois você ainda pode ajustar cada uma.</string>
+  <string name="CITchatDataModeNormal">Normal</string>
+  <string name="CITchatDataModeVideoWifi">Vídeo só no Wi-Fi</string>
+  <string name="CITchatDataModeMaximum">Economia máxima</string>
+  <string name="CITchatDataModeCustom">Personalizado</string>
+  <string name="CITchatDataUsage">Dados móveis neste ciclo</string>
+  <string name="CITchatDataUsageApp">O CITchat usou %1$s</string>
+  <string name="CITchatDataUsagePhone">Celular: %1$s de %2$s (%3$d%%) · CITchat: %4$s</string>
+  <string name="CITchatDataUsageUnavailable">O Android não informou o consumo</string>
+  <string name="CITchatDataCap">Franquia do plano</string>
+  <string name="CITchatDataCapHint">Em GB, por exemplo 20</string>
+  <string name="CITchatDataCapDay">Dia em que renova</string>
+  <string name="CITchatDataCapDayHint">Dia do mês, de 1 a 28</string>
+  <string name="CITchatDataCapNotSet">Toque para receber um aviso antes de acabar</string>
+  <string name="CITchatDataCapValue">%1$s, renova dia %2$d · aviso a partir de 80%%</string>
+  <string name="CITchatDataCapNeedsAccess">%1$s, renova dia %2$d · permita o acesso ao uso para receber avisos</string>
+  <string name="CITchatDataDesc">O aviso compara os dados móveis de todo o celular com a sua franquia, usando o acesso ao uso do Android. Nada sai do celular.</string>
+  <string name="CITchatDataAccessInfo">Para medir os dados móveis de todo o celular, e não só do CITchat, permita o acesso ao uso para o CITchat na próxima tela. O CITchat só lê o total de dados.</string>
+  <string name="CITchatDataAccessAllow">Permitir acesso ao uso</string>
+  <string name="CITchatDataCapTitle">Sua internet está acabando</string>
+  <string name="CITchatDataCapReachedTitle">Sua franquia de internet acabou</string>
+  <string name="CITchatDataCapText">Você já usou %1$d%% da franquia deste ciclo (%2$s de %3$s). Ative a economia máxima nas configurações de dados do CITchat.</string>
 </resources>

@@ -1238,6 +1238,7 @@ public class MessagesManager implements Client.ResultHandler, MessagesSearchMana
           insertExtraSponsoredMessages(items, true);
           adapter.addMessages(items, true);
         }
+        controller.checkScamWarning(items);
         checkTopEndReached(items, willRepeat, canLoadTop);
         if (scrollMessage == null) {
           if (scrollMessageId != null && scrollMessageId.isHistoryStart() && !items.isEmpty()) {
@@ -1909,6 +1910,7 @@ public class MessagesManager implements Client.ResultHandler, MessagesSearchMana
     }
     if (!message.isOutgoing()) {
       controller.checkSwitchPm(message.getMessage());
+      controller.checkScamWarning(message);
     }
     if (!loader.canLoadBottom()) {
       boolean atBottom = manager.findFirstVisibleItemPosition() == 0;
